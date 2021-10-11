@@ -11,11 +11,15 @@ WorkflowClusterassembly.initialise(params, log)
 
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.multiqc_config, params.fasta ]
+def checkPathParamList = [
+    params.left_reads, params.right_reads,
+    params.long_reads, params.db_seq
+    ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+if (!(params.left_reads && params.right_reads)) { exit 1, 'Short reads not specified!' }
+if (!(params.long_reads || params.db_seq)) { exit 1, 'Long sequences not specified!' }
 
 /*
 ========================================================================================
