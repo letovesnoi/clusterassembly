@@ -8,6 +8,7 @@ import sys
 import errno
 import argparse
 
+data_types = ["paired_reads", "long_reads", "db_seq"]
 
 def parse_args(args=None):
     Description = "Reformat nf-core/clusterassembly samplesheet file and check its contents."
@@ -38,27 +39,57 @@ def print_error(error, context="Line", context_str=""):
     sys.exit(1)
 
 
+def check_file_ext(path, line, extensions):
+    if path:
+        if path.find(" ") != -1:
+            print_error("Path contains spaces!", "Line", line)
+        err_ext = True
+        for ext in extensions:
+            if path.endswith(".{}.gz".format(ext)):
+                err_ext = False
+                break
+        if err_ext:
+            print_error(
+                "File does not have extension '." + ".gz' or '.".join(extensions) + ".gz'!",
+                "Line",
+                line,
+            )
+
+def get_sample_info(sample, type, reads_1, reads_2):
+    if sample and reads_1 and reads_2 and type == data_types[0]:  ## Short reads (paired-end)
+        return [type, reads_1, reads_2]
+    elif sample and reads_1 and not reads_2 and type in data_types[1:]:  ## Long sequences (reads or transcripts)
+        return [type, reads_1]
+    else:
+        print_error("Invalid combination of columns provided!", "Line", line)
+
+
 # TODO nf-core: Update the check_samplesheet function
 def check_samplesheet(file_in, file_out):
     """
     This function checks that the samplesheet follows the following structure:
 
-    sample,fastq_1,fastq_2
-    SAMPLE_PE,SAMPLE_PE_RUN1_1.fastq.gz,SAMPLE_PE_RUN1_2.fastq.gz
-    SAMPLE_PE,SAMPLE_PE_RUN2_1.fastq.gz,SAMPLE_PE_RUN2_2.fastq.gz
-    SAMPLE_SE,SAMPLE_SE_RUN1_1.fastq.gz,
+    sample,type,reads_1,reads_2
+    SAMPLE_1,paired_reads,SAMPLE_PE_RUN1_1.fastq.gz,SAMPLE_PE_RUN1_2.fastq.gz
+    SAMPLE_1,long_reads,SAMPLE_1_ISOSEQ.fasta.gz,
+    SAMPLE_1,db_seq,TRANSCRIPTS_1.fa.gz,
+    SAMPLE_2,paired_reads,SAMPLE_PE_RUN2_1.fastq.gz,SAMPLE_PE_RUN2_2.fastq.gz
+    SAMPLE_2,long_reads,SAMPLE_2_ONT.fasta.gz,
+    SAMPLE_2,long_reads,SAMPLE_2_PACBIO.fasta.gz,
+    SAMPLE_2,db_seq,TRANSCRIPTS_2.fa.gz,
+
 
     For an example see:
-    https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
+    https://raw.githubusercontent.com/letovesnoi/test-datasets/clusterassembly/samplesheet.csv
     """
 
     sample_mapping_dict = {}
     with open(file_in, "r") as fin:
 
         ## Check header
-        MIN_COLS = 2
+        MIN_COLS = 3
         # TODO nf-core: Update the column names for the input samplesheet
-        HEADER = ["sample", "fastq_1", "fastq_2"]
+        HEADER = ["sample", "type", "reads_1", "reads_2"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
         if header[: len(HEADER)] != HEADER:
             print("ERROR: Please check samplesheet header -> {} != {}".format(",".join(header), ",".join(HEADER)))
@@ -84,33 +115,29 @@ def check_samplesheet(file_in, file_out):
                 )
 
             ## Check sample name entries
-            sample, fastq_1, fastq_2 = lspl[: len(HEADER)]
+            sample, type, reads_1, reads_2 = lspl[: len(HEADER)]
             sample = sample.replace(" ", "_")
             if not sample:
                 print_error("Sample entry has not been specified!", "Line", line)
 
-            ## Check FastQ file extension
-            for fastq in [fastq_1, fastq_2]:
-                if fastq:
-                    if fastq.find(" ") != -1:
-                        print_error("FastQ file contains spaces!", "Line", line)
-                    if not fastq.endswith(".fastq.gz") and not fastq.endswith(".fq.gz"):
-                        print_error(
-                            "FastQ file does not have extension '.fastq.gz' or '.fq.gz'!",
-                            "Line",
-                            line,
-                        )
+            ## Check reads type
+            if type not in data_types:
+                print_error(
+                    "Invalid type of data. Please use one of the following: {}.".
+                        format(", ".join(data_types)),
+                    "Line",
+                    line,
+                )
+            ## Check file extensions
+            for reads in [reads_1, reads_2]:
+                if type == data_types[0]:  ## "paired_reads"
+                    check_file_ext(reads, line, ['fastq', 'fq'])
+                else:  ## "long_reads", "db_seq"
+                    check_file_ext(reads, line, ['fasta', 'fa', 'fastq', 'fq'])
 
-            ## Auto-detect paired-end/single-end
-            sample_info = []  ## [single_end, fastq_1, fastq_2]
-            if sample and fastq_1 and fastq_2:  ## Paired-end short reads
-                sample_info = ["0", fastq_1, fastq_2]
-            elif sample and fastq_1 and not fastq_2:  ## Single-end short reads
-                sample_info = ["1", fastq_1, fastq_2]
-            else:
-                print_error("Invalid combination of columns provided!", "Line", line)
+            sample_info = get_sample_info(sample, type, reads_1, reads_2)
 
-            ## Create sample mapping dictionary = { sample: [ single_end, fastq_1, fastq_2 ] }
+            ## Create sample mapping dictionary = { sample: [[ type, reads_1, reads_2 ], ...] }
             if sample not in sample_mapping_dict:
                 sample_mapping_dict[sample] = [sample_info]
             else:
@@ -124,12 +151,12 @@ def check_samplesheet(file_in, file_out):
         out_dir = os.path.dirname(file_out)
         make_dir(out_dir)
         with open(file_out, "w") as fout:
-            fout.write(",".join(["sample", "single_end", "fastq_1", "fastq_2"]) + "\n")
+            fout.write(",".join(["sample", "type", "reads_1", "reads_2"]) + "\n")
             for sample in sorted(sample_mapping_dict.keys()):
 
                 ## Check that multiple runs of the same sample are of the same datatype
-                if not all(x[0] == sample_mapping_dict[sample][0][0] for x in sample_mapping_dict[sample]):
-                    print_error("Multiple runs of a sample must be of the same datatype!", "Sample: {}".format(sample))
+                # if not all(x[0] == sample_mapping_dict[sample][0][0] for x in sample_mapping_dict[sample]):
+                #     print_error("Multiple runs of a sample must be of the same datatype!", "Sample: {}".format(sample))
 
                 for idx, val in enumerate(sample_mapping_dict[sample]):
                     fout.write(",".join(["{}_T{}".format(sample, idx + 1)] + val) + "\n")
