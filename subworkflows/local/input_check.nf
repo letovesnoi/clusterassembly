@@ -12,12 +12,23 @@ workflow INPUT_CHECK {
 
     main:
     SAMPLESHEET_CHECK ( samplesheet )
-        .splitCsv ( header:true, sep:',' )
+        .splitCsv ( header: true, sep: ',' )
         .map { create_fastq_channels(it) }
-        .set { reads }
+        .branch { meta, list ->
+                  reads: meta.type == "paired_reads"
+                  long_reads: meta.type == "long_reads"
+                  db_seq: meta.type == "db_seq"
+                  }
+        .set { result }
+
+    result.reads.view { "$it is paired reads" }
+    result.long_reads.view { "$it is long reads" }
+    result.db_seq.view { "$it is database sequences" }
 
     emit:
-    reads // channel: [ val(meta), [ reads ] ]
+        reads = result.reads
+        long_reads = result.long_reads
+        db_seq = result.db_seq
 }
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
@@ -40,3 +51,4 @@ def create_fastq_channels(LinkedHashMap row) {
     }
     return array
 }
+
