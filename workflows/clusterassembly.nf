@@ -46,12 +46,14 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
+include { BRANCH_SEQ } from '../subworkflows/local/branch_seq' addParams ( options: [:] )
 
 /*
 ========================================================================================
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
 ========================================================================================
 */
+
 
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
@@ -82,11 +84,18 @@ workflow CLUSTERASSEMBLY {
         ch_input
     )
 
+     //
+    // SUBWORKFLOW: Split input sequences into paired reads, long reads and database sequences
+    //
+    BRANCH_SEQ (
+        INPUT_CAT.out.reads
+    )
+
     //
     // MODULE: Run FastQC
     //
     FASTQC (
-        INPUT_CHECK.out.reads
+        BRANCH_SEQ.out.paired_reads
     )
     ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
 
