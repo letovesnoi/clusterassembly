@@ -14,34 +14,28 @@ workflow INPUT_CHECK {
     SAMPLESHEET_CHECK ( samplesheet )
         .splitCsv ( header: true, sep: ',' )
         .map { create_fastq_channels(it) }
-        .branch { meta, list ->
-                  reads: meta.type == "paired_reads"
-                  long_reads: meta.type == "long_reads"
-                  db_seq: meta.type == "db_seq"
-                  }
-        .set { result }
-
-    result.reads.view { "$it is paired reads" }
-    result.long_reads.view { "$it is long reads" }
-    result.db_seq.view { "$it is database sequences" }
+        .set { reads }
 
     emit:
-        reads = result.reads
-        long_reads = result.long_reads
-        db_seq = result.db_seq
+    reads // channel: [ val(meta), [ reads ] ]
 }
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
 def create_fastq_channels(LinkedHashMap row) {
     def meta = [:]
-    meta.id           = row.sample
-    meta.type   = row.type
+    meta.id         = row.sample
+    meta.type       = row.type
+    meta.single_end = true
+    if ( meta.type == "paired_reads" ) {
+        meta.single_end = false
+    }
+
 
     def array = []
     if (!file(row.reads_1).exists()) {
         exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.reads_1}"
     }
-    if (meta.type != "paired_reads") {
+    if (meta.single_end) {
         array = [ meta, [ file(row.reads_1) ] ]
     } else {
         if (!file(row.reads_2).exists()) {
