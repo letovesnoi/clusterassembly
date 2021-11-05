@@ -54,6 +54,8 @@ include { BRANCH_SEQ } from '../subworkflows/local/branch_seq' addParams ( optio
 ========================================================================================
 */
 
+def cat_fastq_options = modules['cat_fastq']
+if ( !params.save_merged_fastq ) { cat_fastq_options['publish_files'] = false }
 
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
@@ -62,7 +64,8 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 // MODULE: Installed directly from nf-core/modules
 //
 include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
-include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
+include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options )
+include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options )
 
 /*
 ========================================================================================
@@ -84,11 +87,37 @@ workflow CLUSTERASSEMBLY {
         ch_input
     )
 
+    //
+    // SUBWORKFLOW: Concatenate sequence files from the same sample if required (separately for each type of data)
+    //
+    INPUT_CHECK.out
+    .map {
+        meta, list ->
+            meta.id = meta.id.split('_')[0..-2].join('_')
+            [ meta, list ] }
+    .groupTuple(by: [0])
+    .branch {
+        meta, list ->
+            single : list.size() == 1
+                return [ meta, list.flatten() ]
+            multiple: list.size() > 1
+                return [ meta, list.flatten() ]
+    }
+    .set { ch_seq }
+
+    CAT_FASTQ (
+        ch_seq.multiple
+    )
+    .reads
+    .mix(ch_seq.single)
+    .set { ch_cat_seq }
+    ch_software_versions = ch_software_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
+
      //
     // SUBWORKFLOW: Split input sequences into paired reads, long reads and database sequences
     //
     BRANCH_SEQ (
-        INPUT_CAT.out.reads
+        ch_cat_seq
     )
 
     //
