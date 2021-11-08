@@ -43,13 +43,9 @@ def check_file_ext(path, line, extensions):
     if path:
         if path.find(" ") != -1:
             print_error("Path contains spaces!", "Line", line)
-        # Remove raw from directly github link
-        ch_path = path
-        if path.find("?raw=true"):
-            ch_path = path[:path.find("?raw=true")]
         err_ext = True
         for ext in extensions:
-            if ch_path.endswith(".{}.gz".format(ext)):
+            if path.endswith(".{}.gz".format(ext)):
                 err_ext = False
                 break
         if err_ext:
