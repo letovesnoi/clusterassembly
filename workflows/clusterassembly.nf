@@ -60,13 +60,16 @@ if ( !params.save_merged_fastq ) { cat_fastq_options['publish_files'] = false }
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
 
+def spades_options   = modules['spades']
+spades_options.args += params.spades_mode ? Utils.joinModuleArgs(["--${params.spades_mode}"]) : ''
+
 //
 // MODULE: Installed directly from nf-core/modules
 //
 include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
 include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options )
 include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options )
-
+include { SPADES } from '../modules/nf-core/modules/spades/main' addParams ( options: spades_options)
 /*
 ========================================================================================
     RUN MAIN WORKFLOW
@@ -127,6 +130,14 @@ workflow CLUSTERASSEMBLY {
         BRANCH_SEQ.out.paired_reads
     )
     ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
+
+    //
+    // MODULE: Run SPAdes with short paired reads
+    //
+    SPADES (
+        BRANCH_SEQ.out.paired_reads, []
+    )
+    ch_software_versions = ch_software_versions.mix(SPADES.out.version.first().ifEmpty(null))
 
     //
     // MODULE: Pipeline reporting
