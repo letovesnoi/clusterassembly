@@ -11,7 +11,7 @@ process SPADES {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:meta, publish_by_meta:['id']) }
 
-    conda (params.enable_conda ? 'bioconda::spades=3.15.3' : null)
+    conda (params.enable_conda ? 'bioconda::spades=3.15.3 python=3.9' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
         container "https://depot.galaxyproject.org/singularity/spades:3.15.3--h95f258a_0"
     } else {
