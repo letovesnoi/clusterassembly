@@ -114,7 +114,7 @@ workflow CLUSTERASSEMBLY {
     ch_software_versions = ch_software_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
      //
-    // SUBWORKFLOW: Split input sequences into paired reads, long reads and database sequences
+    // SUBWORKFLOW: Split input sequences into short reads, long reads and database sequences
     //
     BRANCH_SEQ (
         ch_cat_seq
@@ -124,15 +124,15 @@ workflow CLUSTERASSEMBLY {
     // MODULE: Run FastQC
     //
     FASTQC (
-        BRANCH_SEQ.out.paired_reads
+        BRANCH_SEQ.out.short_reads
     )
     ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
 
     //
-    // MODULE: Run SPAdes with short paired reads
+    // MODULE: Run SPAdes with short reads
     //
     SPADES (
-        BRANCH_SEQ.out.paired_reads, []
+        BRANCH_SEQ.out.short_reads, []
     )
     ch_software_versions = ch_software_versions.mix(SPADES.out.version.first().ifEmpty(null))
 

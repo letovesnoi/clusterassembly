@@ -25,11 +25,7 @@ def create_fastq_channels(LinkedHashMap row) {
     def meta = [:]
     meta.id         = row.sample
     meta.type       = row.type
-    meta.single_end = true
-    if ( meta.type == "paired_reads" ) {
-        meta.single_end = false
-    }
-
+    meta.single_end = row.single_end.toBoolean()
 
     def array = []
     if (!file(row.reads_1).exists()) {

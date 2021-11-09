@@ -1,5 +1,5 @@
 //
-// Split input channels into paired reads, long reads and db seq channels
+// Split input channels into short reads, long reads and db seq channels
 //
 
 params.options = [:]
@@ -11,18 +11,18 @@ workflow BRANCH_SEQ {
     main:
     ch_seq
         .branch { meta, list ->
-                  paired_reads: meta.type == "paired_reads"
+                  short_reads: meta.type == "short_reads"
                   long_reads: meta.type == "long_reads"
                   db_seq: meta.type == "db_seq"
                   }
         .set { result }
 
-//     result.reads.view { "$it is paired reads" }
+//     result.reads.view { "$it is short reads" }
 //     result.long_reads.view { "$it is long reads" }
 //     result.db_seq.view { "$it is database sequences" }
 
     emit:
-        paired_reads = result.paired_reads
+        short_reads = result.short_reads
         long_reads = result.long_reads
         db_seq = result.db_seq
 }
