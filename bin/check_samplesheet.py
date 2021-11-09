@@ -84,9 +84,10 @@ def check_samplesheet(file_in, file_out):
     https://raw.githubusercontent.com/letovesnoi/test-datasets/clusterassembly/samplesheet.csv
     """
 
-    sample_mapping_dict = {}
-    with open(file_in, "r") as fin:
+    from collections import defaultdict
 
+    sample_mapping_dict = defaultdict(dict)
+    with open(file_in, "r") as fin:
         ## Check header
         MIN_COLS = 3
         # TODO nf-core: Update the column names for the input samplesheet
@@ -138,13 +139,13 @@ def check_samplesheet(file_in, file_out):
 
             ## sample_info = [ type, single_end, reads_1, reads_2 ]
             sample_info = get_sample_info(line, sample, type, reads_1, reads_2)
-            if sample not in sample_mapping_dict:
-                sample_mapping_dict[sample] = [sample_info]
+            if sample_info[0] not in sample_mapping_dict[sample]:
+                sample_mapping_dict[sample][sample_info[0]] = [sample_info[1:]]
             else:
-                if sample_info in sample_mapping_dict[sample]:
+                if sample_info[1:] in sample_mapping_dict[sample][sample_info[0]]:
                     print_error("Samplesheet contains duplicate rows!", "Line", line)
                 else:
-                    sample_mapping_dict[sample].append(sample_info)
+                    sample_mapping_dict[sample][sample_info[0]].append(sample_info[1:])
 
     ## Write validated samplesheet with appropriate columns
     if len(sample_mapping_dict) > 0:
@@ -153,13 +154,14 @@ def check_samplesheet(file_in, file_out):
         with open(file_out, "w") as fout:
             fout.write(",".join(["sample", "type", "single_end", "reads_1", "reads_2"]) + "\n")
             for sample in sorted(sample_mapping_dict.keys()):
+                idx = 0
+                for type in sorted(sample_mapping_dict[sample].keys()):
+                    ## Check that multiple runs of the same sample are either all paired or all single-end
+                    if not all(x[0] == sample_mapping_dict[sample][type][0][0] for x in sample_mapping_dict[sample][type]):
+                        print_error("Multiple runs of a sample must be either all paired or all single-end!", "Sample: {}".format(sample))
 
-                ## Check that multiple runs of the same sample are of the same datatype
-                # if not all(x[0] == sample_mapping_dict[sample][0][0] for x in sample_mapping_dict[sample]):
-                #     print_error("Multiple runs of a sample must be of the same datatype!", "Sample: {}".format(sample))
-
-                for idx, val in enumerate(sample_mapping_dict[sample]):
-                    fout.write(",".join(["{}_T{}".format(sample, idx + 1)] + val) + "\n")
+                    for val in sample_mapping_dict[sample][type]:
+                        fout.write(",".join(["{}_T{}".format(sample, idx + 1)] + [type] + val) + "\n")
     else:
         print_error("No entries to process!", "Samplesheet: {}".format(file_in))
 
