@@ -60,16 +60,13 @@ if ( !params.save_merged_fastq ) { cat_fastq_options['publish_files'] = false }
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
 
-def spades_options   = modules['spades']
-spades_options.args += params.spades_mode ? Utils.joinModuleArgs(["--${params.spades_mode}"]) : ''
-
 //
 // MODULE: Installed directly from nf-core/modules
 //
 include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
 include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options )
 include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options )
-include { SPADES } from '../modules/nf-core/modules/spades/main' addParams ( options: spades_options)
+include { SPADES } from '../modules/nf-core/modules/spades/main' addParams ( options: modules['spades'])
 /*
 ========================================================================================
     RUN MAIN WORKFLOW
