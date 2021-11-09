@@ -55,7 +55,7 @@ def check_file_ext(path, line, extensions):
                 line,
             )
 
-def get_sample_info(sample, type, reads_1, reads_2):
+def get_sample_info(line, sample, type, reads_1, reads_2):
     ## Create sample mapping dictionary = { sample: [ type, single_end, reads_1, reads_2 ] }
     if sample and reads_1 and reads_2 and type == data_types[0]:  ## Paired-end short reads
         return [type, "0", reads_1, reads_2]
@@ -137,7 +137,7 @@ def check_samplesheet(file_in, file_out):
                     check_file_ext(reads, line, ['fasta', 'fa', 'fastq', 'fq'])
 
             ## sample_info = [ type, single_end, reads_1, reads_2 ]
-            sample_info = get_sample_info(sample, type, reads_1, reads_2)
+            sample_info = get_sample_info(line, sample, type, reads_1, reads_2)
             if sample not in sample_mapping_dict:
                 sample_mapping_dict[sample] = [sample_info]
             else:
