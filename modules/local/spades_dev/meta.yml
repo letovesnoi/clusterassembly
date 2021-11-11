@@ -1,0 +1,70 @@
+name: spades
+description: Assembles a small genome (bacterial, fungal, viral)
+keywords:
+  - genome
+  - assembly
+  - genome assembler
+  - small genome
+  - de novo assembler
+tools:
+  - spades:
+      description: SPAdes (St. Petersburg genome assembler) is intended for both standard isolates and single-cell MDA bacteria assemblies.
+      homepage: http://cab.spbu.ru/files/release3.15.0/manual.html
+      documentation: http://cab.spbu.ru/files/release3.15.0/manual.html
+      tool_dev_url: https://github.com/ablab/spades
+      doi: 10.1089/cmb.2012.0021
+      licence: ['GPL v2']
+input:
+  - meta.id:
+      type: string
+      description: |
+        Groovy String containing sample id information
+        e.g. "MCF_rand25"
+  - short_reads:
+      type: file
+      description: |
+        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
+        respectively.
+  - long_reads:
+      type: file
+      description:
+        File with Fasta long reads.
+  - db_seq:
+      type: file
+        description:
+          File with Fasta database sequences as transcripts of close reference.
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - scaffolds:
+      type: file
+      description: |
+        Fasta file containing scaffolds
+  - contigs:
+      type: file
+      description: |
+        Fasta file containing contigs
+  - transcripts:
+      type: file
+      description: |
+        Fasta file containing transcripts
+  - gfa:
+      type: file
+      description: |
+        gfa file containing assembly
+  - log:
+      type: file
+      description: |
+        Spades log file
+  - version:
+      type: file
+      description: File containing software version
+      pattern: "*.{version.txt}"
+
+authors:
+  - "@JoseEspinosa"
+  - "@drpatelh"
+  - "@letovesnoi"

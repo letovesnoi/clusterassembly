@@ -66,7 +66,7 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
 include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options )
 include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options )
-include { SPADES } from '../modules/nf-core/modules/spades/main' addParams ( options: modules['spades'])
+include { SPADES_DEV } from '../modules/local/spades_dev/main' addParams ( options: modules['spades_dev'])
 /*
 ========================================================================================
     RUN MAIN WORKFLOW
@@ -113,7 +113,7 @@ workflow CLUSTERASSEMBLY {
     .set { ch_cat_seq }
     ch_software_versions = ch_software_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
-     //
+    //
     // SUBWORKFLOW: Split input sequences into short reads, long reads and database sequences
     //
     BRANCH_SEQ (
@@ -129,12 +129,29 @@ workflow CLUSTERASSEMBLY {
     ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
 
     //
+    // SUBWORKFLOW: Join short reads, long reads and db sequences channels by sample id
+    // [ meta_id, [ fastq_1, fastq_2 ], fasta, fasta ]
+    ch_short = BRANCH_SEQ.out.short_reads
+    .map { meta, list ->
+        sample = meta.id
+        [sample, list] }
+    ch_long = BRANCH_SEQ.out.long_reads
+    .map { meta, list ->
+        sample = meta.id
+        [sample, list] }
+    ch_db = BRANCH_SEQ.out.db_seq
+    .map { meta, list ->
+        sample = meta.id
+        [sample, list] }
+    all_by_sample = ch_short.join(ch_long).join(ch_db)
+
+    //
     // MODULE: Run SPAdes with short reads
     //
-    SPADES (
-        BRANCH_SEQ.out.short_reads, []
+    SPADES_DEV (
+        all_by_sample
     )
-    ch_software_versions = ch_software_versions.mix(SPADES.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(SPADES_DEV.out.version.first().ifEmpty(null))
 
     //
     // MODULE: Pipeline reporting
