@@ -135,7 +135,7 @@ def check_samplesheet(file_in, file_out):
                 if type == data_types[0]:  ## "short_reads"
                     check_file_ext(reads, line, ['fastq', 'fq'])
                 else:  ## "long_reads", "db_seq"
-                    check_file_ext(reads, line, ['fasta', 'fa', 'fastq', 'fq'])
+                    check_file_ext(reads, line, ['fasta', 'fa'])
 
             ## sample_info = [ type, single_end, reads_1, reads_2 ]
             sample_info = get_sample_info(line, sample, type, reads_1, reads_2)
