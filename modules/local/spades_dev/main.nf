@@ -46,6 +46,13 @@ process SPADES_DEV {
         -o ./
     mv spades.log ${prefix}.spades.log
 
+    kDir="K0"
+    for dir in \$(ls -d K*); do
+        if ((\${dir:1} > \${kDir:1})); then
+            kDir=\$dir
+        fi
+    done
+
     if [ -f scaffolds.fasta ]; then
         mv scaffolds.fasta ${prefix}.scaffolds.fa
     fi
@@ -58,11 +65,11 @@ process SPADES_DEV {
     if [ -f assembly_graph_with_scaffolds.gfa ]; then
         mv assembly_graph_with_scaffolds.gfa ${prefix}.assembly.gfa
     fi
-    if [ -d K49/saves/late_pair_info_count/ ]; then
-        mv K49/saves/late_pair_info_count/ ${prefix}.late_pair_info_count
+    if [ -d \${kDir}/saves/late_pair_info_count/ ]; then
+        mv \${kDir}/saves/late_pair_info_count/ ${prefix}.\${kDir}.late_pair_info_count
     fi
-    if [ -f K49/configs/config.info ]; then
-        mv K49/configs/config.info ${prefix}.config.info
+    if [ -f \${kDir}/configs/config.info ]; then
+        mv \${kDir}/configs/config.info ${prefix}.\${kDir}.config.info
     fi
     echo \$(spades.py --version 2>&1) | sed 's/^.*SPAdes genome assembler v//; s/ .*\$//' > ${software}.version.txt
     """
