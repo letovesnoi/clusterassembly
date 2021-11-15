@@ -22,12 +22,14 @@ process SPADES_DEV {
     tuple val(sample), path(short_reads), path(long_reads), path(db_seq)
 
     output:
-    tuple val(sample), path('*.scaffolds.fa')    , optional:true, emit: scaffolds
-    tuple val(sample), path('*.contigs.fa')      , optional:true, emit: contigs
-    tuple val(sample), path('*.transcripts.fa')  , optional:true, emit: transcripts
-    tuple val(sample), path('*.assembly.gfa')    , optional:true, emit: gfa
-    tuple val(sample), path('*.log')             , emit: log
-    path  '*.version.txt'                        , emit: version
+    tuple val(sample), path('*.scaffolds.fa')                    , optional:true, emit: scaffolds
+    tuple val(sample), path('*.contigs.fa')                      , optional:true, emit: contigs
+    tuple val(sample), path('*.transcripts.fa')                  , optional:true, emit: transcripts
+    tuple val(sample), path('*.assembly.gfa')                    , optional:true, emit: gfa
+    tuple val(sample), path('*.late_pair_info_count')            , optional:true, emit: saves
+    tuple val(sample), path('*.config.info')                     , optional:true, emit: config
+    tuple val(sample), path('*.log')                             , emit: log
+    path  '*.version.txt'                                        , emit: version
 
     script:
     def software    = getSoftwareName(task.process)
@@ -56,7 +58,12 @@ process SPADES_DEV {
     if [ -f assembly_graph_with_scaffolds.gfa ]; then
         mv assembly_graph_with_scaffolds.gfa ${prefix}.assembly.gfa
     fi
-
+    if [ -d K49/saves/late_pair_info_count/ ]; then
+        mv K49/saves/late_pair_info_count/ ${prefix}.late_pair_info_count
+    fi
+    if [ -f K49/configs/config.info ]; then
+        mv K49/configs/config.info ${prefix}.config.info
+    fi
     echo \$(spades.py --version 2>&1) | sed 's/^.*SPAdes genome assembler v//; s/ .*\$//' > ${software}.version.txt
     """
 }
