@@ -4,7 +4,7 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 options        = initOptions(params.options)
 
-process SPADES_DEV {
+process SPADES_SAVES {
     tag "$sample"
     label 'process_high'
     publishDir "${params.outdir}",

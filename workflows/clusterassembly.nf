@@ -47,7 +47,7 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 include { BRANCH_SEQ } from '../subworkflows/local/branch_seq' addParams ( options: [:] )
-include { SPADES_DEV } from '../modules/local/spades_dev/main' addParams ( options: modules['spades_dev'])
+include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'])
 
 /*
 ========================================================================================
@@ -149,10 +149,10 @@ workflow CLUSTERASSEMBLY {
     //
     // MODULE: Run SPAdes with short reads and long sequences (long reads and database transcripts)
     //
-    SPADES_DEV (
+    SPADES_SAVES (
         all_by_sample
     )
-    ch_software_versions = ch_software_versions.mix(SPADES_DEV.out.version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(SPADES_SAVES.out.version.first().ifEmpty(null))
 
     //
     // MODULE: Pipeline reporting
