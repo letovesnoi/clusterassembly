@@ -47,6 +47,7 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 include { BRANCH_SEQ } from '../subworkflows/local/branch_seq' addParams ( options: [:] )
+include { SPADES_DEV } from '../modules/local/spades_dev/main' addParams ( options: modules['spades_dev'])
 
 /*
 ========================================================================================
@@ -66,7 +67,7 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
 include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options )
 include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options )
-include { SPADES_DEV } from '../modules/local/spades_dev/main' addParams ( options: modules['spades_dev'])
+
 /*
 ========================================================================================
     RUN MAIN WORKFLOW
@@ -146,7 +147,7 @@ workflow CLUSTERASSEMBLY {
     all_by_sample = ch_short.join(ch_long).join(ch_db)
 
     //
-    // MODULE: Run SPAdes with short reads
+    // MODULE: Run SPAdes with short reads and long sequences (long reads and database transcripts)
     //
     SPADES_DEV (
         all_by_sample
