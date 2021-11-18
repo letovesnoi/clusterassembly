@@ -58,11 +58,7 @@ output:
   - saves:
       type: file
       description: |
-        Folder with saves to restart SPAdes from the last checkpoint
-  - config:
-      type: file
-      description: |
-        Path to SPAdes configuration file
+        Whole SPAdes output directory with saves and configuration files
   - log:
       type: file
       description: |
