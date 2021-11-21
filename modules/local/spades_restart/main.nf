@@ -55,17 +55,17 @@ process SPADES_RESTART {
 
     spades-core \$config_restart ${saves}/\${kDir}/configs/mda_mode.info ${saves}/\${kDir}/configs/rna_mode.info > ${prefix}.spades.log
 
-    if [ -f ${prefix}.spades_out/scaffolds.fasta ]; then
-        mv ${prefix}.spades_out/scaffolds.fasta ${prefix}.scaffolds.fa
+    if [ -f ${prefix}.spades_out/\${kDir}/scaffolds.fasta ]; then
+        mv ${prefix}.spades_out/\${kDir}/scaffolds.fasta ${prefix}.scaffolds.fa
     fi
-    if [ -f ${prefix}.spades_out/contigs.fasta ]; then
-        mv ${prefix}.spades_out/contigs.fasta ${prefix}.contigs.fa
+    if [ -f ${prefix}.spades_out/\${kDir}/contigs.fasta ]; then
+        mv ${prefix}.spades_out/\${kDir}/contigs.fasta ${prefix}.contigs.fa
     fi
-    if [ -f ${prefix}.spades_out/transcripts.fasta ]; then
-        mv ${prefix}.spades_out/transcripts.fasta ${prefix}.transcripts.fa
+    if [ -f ${prefix}.spades_out/\${kDir}/transcripts.fasta ]; then
+        mv ${prefix}.spades_out/\${kDir}/transcripts.fasta ${prefix}.transcripts.fa
     fi
-    if [ -f ${prefix}.spades_out/assembly_graph_with_scaffolds.gfa ]; then
-        mv ${prefix}.spades_out/assembly_graph_with_scaffolds.gfa ${prefix}.assembly.gfa
+    if [ -f ${prefix}.spades_out/\${kDir}/assembly_graph_with_scaffolds.gfa ]; then
+        mv ${prefix}.spades_out/\${kDir}/assembly_graph_with_scaffolds.gfa ${prefix}.assembly.gfa
     fi
     echo \$(spades.py --version 2>&1) | sed 's/^.*SPAdes genome assembler v//; s/ .*\$//' > ${software}.version.txt
     """
