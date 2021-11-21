@@ -38,10 +38,11 @@ process SPADES_RESTART {
     for path in \$(ls -d ${saves}/K*); do
         dir=\$(basename \${path})
         if ((\${dir:1} > \${kDir:1})); then
-            kDir=\$dir
+            kDir=\${dir}
         fi
     done
 
+    # Modify config.info
     config="${saves}/\${kDir}/configs/config.info"
     config_restart="${saves}/\${kDir}/configs/config_restart.info"
     cp \$config \$config_restart
@@ -50,11 +51,25 @@ process SPADES_RESTART {
     sed -i "s/entry_point read_conversion.*/\\;entry_point read_conversion/" \$config_restart
     sed -i "s/\\;entry_point repeat_resolving.*/entry_point repeat_resolving/" \$config_restart
 
+    # Replace binary alignment files with blank files to get only short reads assembly
+    for path in \$(ls -d ${saves}/\${kDir}/saves/late_pair_info_count/graph_pack_*.mpr); do
+        basename=\$(basename \${path})
+        ext=\${basename##*.}
+        filename=\${basename%.*}
+        mpr_old="${saves}/\${kDir}/saves/late_pair_info_count/\${filename}.old.\${ext}"
+        mv \${path} \${mpr_old}
+        zero_byte="\\x00"
+        echo -n -e \${zero_byte} > \${path}
+    done
+
+    # Create output directories
     mkdir ${prefix}.spades_out
     mkdir ${prefix}.spades_out/tmp
 
+    # Run spades restart
     spades-core \$config_restart ${saves}/\${kDir}/configs/mda_mode.info ${saves}/\${kDir}/configs/rna_mode.info > ${prefix}.spades.log
 
+    # Move resulting files
     if [ -f ${prefix}.spades_out/\${kDir}/scaffolds.fasta ]; then
         mv ${prefix}.spades_out/\${kDir}/scaffolds.fasta ${prefix}.scaffolds.fa
     fi
@@ -67,6 +82,8 @@ process SPADES_RESTART {
     if [ -f ${prefix}.spades_out/\${kDir}/assembly_graph_with_scaffolds.gfa ]; then
         mv ${prefix}.spades_out/\${kDir}/assembly_graph_with_scaffolds.gfa ${prefix}.assembly.gfa
     fi
+
+    # Get spades version
     echo \$(spades.py --version 2>&1) | sed 's/^.*SPAdes genome assembler v//; s/ .*\$//' > ${software}.version.txt
     """
 }
