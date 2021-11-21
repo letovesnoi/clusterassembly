@@ -53,7 +53,7 @@ process SPADES_RESTART {
     mkdir ${prefix}.spades_out
     mkdir ${prefix}.spades_out/tmp
 
-    spades-core \$config_restart > ${prefix}.spades.log
+    spades-core \$config_restart ${saves}/\${kDir}/configs/mda_mode.info ${saves}/\${kDir}/configs/rna_mode.info > ${prefix}.spades.log
 
     if [ -f ${prefix}.spades_out/scaffolds.fasta ]; then
         mv ${prefix}.spades_out/scaffolds.fasta ${prefix}.scaffolds.fa
