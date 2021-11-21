@@ -50,6 +50,9 @@ process SPADES_RESTART {
     sed -i "s/entry_point read_conversion.*/\\;entry_point read_conversion/" \$config_restart
     sed -i "s/\\;entry_point repeat_resolving.*/entry_point repeat_resolving/" \$config_restart
 
+    mkdir ${prefix}.spades_out
+    mkdir ${prefix}.spades_out/tmp
+
     spades-core \$config_restart
     mv ${prefix}.spades_out/spades.log ${prefix}.spades.log
 
