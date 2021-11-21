@@ -54,7 +54,15 @@ output:
   - gfa:
       type: file
       description: |
-        gfa file containing assembly
+        gfa file containing assembly graph
+  - saves:
+      type: file
+      description: |
+        Folder with saves to restart SPAdes from the last checkpoint
+  - config:
+      type: file
+      description: |
+        Path to SPAdes configuration file
   - log:
       type: file
       description: |
