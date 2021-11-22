@@ -52,11 +52,11 @@ process SPADES_RESTART {
     sed -i "s/\\;entry_point repeat_resolving.*/entry_point repeat_resolving/" \$config_restart
 
     # Replace binary alignment files with blank files to get only short reads assembly
-    for path in \$(ls -d ${saves}/\${kDir}/saves/late_pair_info_count/graph_pack_*.mpr); do
+    for path in \$(ls -d ${saves}/\${kDir}/saves/distance_estimation/graph_pack_*.mpr); do
         basename=\$(basename \${path})
         ext=\${basename##*.}
         filename=\${basename%.*}
-        mpr_old="${saves}/\${kDir}/saves/late_pair_info_count/\${filename}.old.\${ext}"
+        mpr_old="${saves}/\${kDir}/saves/distance_estimation/\${filename}.old.\${ext}"
         mv \${path} \${mpr_old}
         zero_byte="\\x00"
         echo -n -e \${zero_byte} > \${path}
