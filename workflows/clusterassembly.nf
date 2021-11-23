@@ -48,7 +48,7 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 include { BRANCH_SEQ } from '../subworkflows/local/branch_seq' addParams ( options: [:] )
 include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'])
-include { SPADES_RESTART } from '../modules/local/spades_restart/main' addParams ( options: modules['spades_restart'])
+include { PATHEXTEND_SHORT_READS } from '../subworkflows/local/pathextend_short_reads' addParams( options: [:] )
 
 /*
 ========================================================================================
@@ -156,12 +156,12 @@ workflow CLUSTERASSEMBLY {
     ch_software_versions = ch_software_versions.mix(SPADES_SAVES.out.version.first().ifEmpty(null))
 
     //
-    // MODULE: Restart SPAdes from the last checkpoint using previous run directory
+    // MODULE: Restart SPAdes using only short reads from the last checkpoint using saves
     //
-    SPADES_RESTART (
+
+    PATHEXTEND_SHORT_READS (
         SPADES_SAVES.out.saves
     )
-    ch_software_versions = ch_software_versions.mix(SPADES_RESTART.out.version.first().ifEmpty(null))
 
     //
     // MODULE: Pipeline reporting

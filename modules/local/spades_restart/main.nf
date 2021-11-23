@@ -34,40 +34,18 @@ process SPADES_RESTART {
     def prefix      = options.suffix ? "${sample}${options.suffix}" : "${sample}"
 
     """
-    kDir="K0"
-    for path in \$(ls -d ${saves}/K*); do
-        dir=\$(basename \${path})
-        if ((\${dir:1} > \${kDir:1})); then
-            kDir=\${dir}
-        fi
-    done
-
-    # Modify config.info
-    config="${saves}/\${kDir}/configs/config.info"
-    config_restart="${saves}/\${kDir}/configs/config_restart.info"
-    cp \$config \$config_restart
-    sed -i "s/output_base.*/output_base ${prefix}.spades_out/" \$config_restart
-    sed -i "s/tmp_dir.*/tmp_dir ${prefix}.spades_out\\/tmp/" \$config_restart
-    sed -i "s/entry_point read_conversion.*/\\;entry_point read_conversion/" \$config_restart
-    sed -i "s/\\;entry_point repeat_resolving.*/entry_point repeat_resolving/" \$config_restart
-
-    # Replace binary alignment files with blank files to get only short reads assembly
-    for path in \$(ls -d ${saves}/\${kDir}/saves/distance_estimation/graph_pack_*.mpr); do
-        basename=\$(basename \${path})
-        ext=\${basename##*.}
-        filename=\${basename%.*}
-        mpr_old="${saves}/\${kDir}/saves/distance_estimation/\${filename}.old.\${ext}"
-        mv \${path} \${mpr_old}
-        zero_byte="\\x00"
-        echo -n -e \${zero_byte} > \${path}
-    done
+    dirs=(\$(ls -d -r ${saves}/K*))
+    kDir=\$(basename \${dirs[0]})
 
     # Create output directories
     mkdir ${prefix}.spades_out
     mkdir ${prefix}.spades_out/tmp
 
     # Run spades restart
-    spades-core \$config_restart ${saves}/\${kDir}/configs/mda_mode.info ${saves}/\${kDir}/configs/rna_mode.info > ${prefix}.spades.log
+    config="${saves}/\${kDir}/configs/config.info"
+    mda_mode="${saves}/\${kDir}/configs/mda_mode.info"
+    rna_mode="${saves}/\${kDir}/configs/rna_mode.info"
+    spades-core \${config} \${mda_mode} \${rna_mode} > ${prefix}.spades.log
 
     # Move resulting files
     if [ -f ${prefix}.spades_out/\${kDir}/scaffolds.fasta ]; then
