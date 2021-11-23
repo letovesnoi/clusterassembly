@@ -8,7 +8,7 @@ process SPADES_SAVES {
     tag "$sample"
     label 'process_high'
     publishDir "${params.outdir}",
-        mode: 'symlink',
+        mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:['id': sample], publish_by_meta:['id']) }
 
     conda (params.enable_conda ? 'bioconda::spades=3.15.3 python=3.9' : null)
