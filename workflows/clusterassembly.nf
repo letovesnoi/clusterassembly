@@ -49,6 +49,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( opti
 include { BRANCH_SEQ } from '../subworkflows/local/branch_seq' addParams ( options: [:] )
 include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'])
 include { PATHEXTEND_SHORT_READS } from '../subworkflows/local/pathextend_short_reads' addParams( options: [:] )
+include { PATHEXTEND_CLUSTERS } from '../subworkflows/local/pathextend_clusters' addParams( options: [:] )
 
 /*
 ========================================================================================
@@ -161,6 +162,14 @@ workflow CLUSTERASSEMBLY {
 
     PATHEXTEND_SHORT_READS (
         SPADES_SAVES.out.saves
+    )
+
+    //
+    // MODULE: Restart SPAdes using clusters from the last checkpoint using saves
+    //
+    PATHEXTEND_CLUSTERS (
+        SPADES_SAVES.out.saves,
+        SPADES_SAVES.out.saves    // TODO: Replace by clusters
     )
 
     //

@@ -22,7 +22,7 @@ process SPADES_SAVES {
     tuple val(sample), path(short_reads), path(long_reads), path(db_seq)
 
     output:
-    tuple val(sample), path('*.spades_out')         , emit: saves
+    tuple val(sample), path('*.spades_out')           , emit: saves
     tuple val(sample), path('*.scaffolds.fa')         , optional:true, emit: scaffolds
     tuple val(sample), path('*.contigs.fa')           , optional:true, emit: contigs
     tuple val(sample), path('*.transcripts.fa')       , optional:true, emit: transcripts
