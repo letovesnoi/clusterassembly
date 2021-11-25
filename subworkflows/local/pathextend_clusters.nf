@@ -8,7 +8,8 @@ def modules = params.modules.clone()
 include { CONFIG_MODIFY } from '../../modules/local/spades_restart/config_modify' addParams ( options: modules['restart_clusters'])
 include { PE_PARAMS_MODIFY } from '../../modules/local/spades_restart/pe_params_modify' addParams ( options: modules['restart_clusters'])
 include{ COPY_DIR } from '../../modules/local/spades_restart/copy_dir' addParams ( options: modules['restart_clusters'])
-include { SPADES_RESTART } from '../../modules/local/spades_restart/main' addParams( options: modules['restart_clusters'] )
+// TODO: Make pathextend use clusters in next spades release and enable conda again
+include { SPADES_RESTART } from '../../modules/local/spades_restart/main' addParams( options: modules['restart_clusters'], enable_conda: false)
 
 workflow PATHEXTEND_CLUSTERS {
     take:
