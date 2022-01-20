@@ -42,6 +42,7 @@ def modules = params.modules.clone()
 //
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
 include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'])
+include { MPR_TO_READABLE } from '../modules/local/mpr_to_readable' addParams ( options: [:] )
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -159,10 +160,19 @@ workflow CLUSTERASSEMBLY {
     //
     // MODULE: Restart SPAdes using only short reads from the last checkpoint using saves
     //
-
     PATHEXTEND_SHORT_READS (
         SPADES_SAVES.out.saves
     )
+
+    //
+    // MODULE: Reformat SPAdes output alignment files from binary mpr to readable format
+    //
+    MPR_TO_READABLE (
+        SPADES_SAVES.out.saves
+    )
+
+    // TODO: Get clusters from assembly graph and readable alignment files
+
 
     //
     // MODULE: Restart SPAdes using clusters from the last checkpoint using saves
