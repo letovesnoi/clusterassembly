@@ -41,13 +41,13 @@ def modules = params.modules.clone()
 // MODULE: Local to the pipeline
 //
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
+include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'])
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 include { BRANCH_SEQ } from '../subworkflows/local/branch_seq' addParams ( options: [:] )
-include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'])
 include { PATHEXTEND_SHORT_READS } from '../subworkflows/local/pathextend_short_reads' addParams( options: [:] )
 include { PATHEXTEND_CLUSTERS } from '../subworkflows/local/pathextend_clusters' addParams( options: [:] )
 
