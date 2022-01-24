@@ -48,7 +48,7 @@ def parse_args():
                         help='Choose the weight for clustering',
                         choices=['cov_diff', 'reads_and_db', 'geometric_mean', 'harmonic_mean'])
     parser.add_argument('--gfa', '-g', required=True, help='Assembly graph')
-    parser.add_argument('--grseq', required=True, help='Helps preserve the conjugate names')
+    parser.add_argument('--grp', required=True, help='Readable grseq format. For this use show_saves.py. Helps preserve conjugate names.')
     parser.add_argument('--ground_truth', dest='spaligner_ground_truth_tsv', required=True,
                         help='It can be transcripts aligned to assembly graph using SPAligner [tsv]',)
     parser.add_argument('--friendships_reads', dest='spaligner_long_reads_tsv', required=False,
@@ -122,10 +122,7 @@ def main():
     if not os.path.exists(args.outdir):
         os.mkdir(args.outdir)
 
-    command = 'python show_saves.py {} > {}'.format(args.grseq[:-3] + 'p', os.path.join(args.outdir, 'graph_pack.readable.grp'))
-    subprocess.run(command, shell=True)
-
-    conj_dict = graphs.get_conj_dict(os.path.join(args.outdir, 'graph_pack.readable.grp'))
+    conj_dict = graphs.get_conj_dict(os.path.join(args.outdir, args.grp))
     G = gfa_to_G(args.gfa, conj_dict, args.k)
 
     # G = get_tst_G(G)
