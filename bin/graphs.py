@@ -34,6 +34,17 @@ def filter_G_by_weight(G, weight, treshold):
         G.name += '_min_weight_{:.3f}'.format(min_weight)
         # write_G_statistics(G)
 
+# Edge 81 : 1556 -> 17862 , l = 164 ~ 82 .
+# Edge 82 : 17861 -> 1555 , l = 164 ~ 81 .
+def get_conj_dict(readable_grp):
+    conj_dict = {}
+    with open(readable_grp, 'r') as fin:
+        for line in fin:
+            fields = line.strip().split()
+            conj_dict[fields[1]] = fields[11]
+        # print(conj_dict)
+    return conj_dict
+
 def get_A(G):
     A = nx.adjacency_matrix(G)
     print(A.todense())
@@ -88,20 +99,43 @@ def get_friendships_from_spalignments(G, spaligner_tsv, friendship_rate=1):
         # print('Elapsed time on long reads graph construction: {}'.format((end - start) * 1.0 / 60 / 60))
     return friendships_dict
 
-def G_to_friendships_graph(G, spaligner_long_reads_tsv, spaligner_db_tsv):
+def get_friendships_from_spades_readable_fmt(readable_fmt, conj_dict, friendship_rate=1):
+    friendships_dict = defaultdict(int)
+    if readable_fmt:
+        start = time.time()
+        with open(readable_fmt, 'r') as fin:
+            line = fin.readline()
+            count = line.strip()
+            while line:
+                line = fin.readline()
+                if line.strip():
+                    fields = line.strip().split()
+                    weight = int(fields[1])
+                    length = int(fields[3])
+                    path = fields[4:]
+                    conj_path = [conj_dict[edge] for edge in reversed(path)]
+                    for p in [path, conj_path]:
+                        for u, v in itertools.combinations(p, 2):
+                            friendships_dict[(u, v)] += friendship_rate * weight
+                else:
+                    count = fin.readline().strip()
+        end = time.time()
+        # print('Elapsed time on long reads graph construction: {}'.format((end - start) * 1.0 / 60 / 60))
+        return friendships_dict
+
+def G_to_friendships_graph(G, conj_dict, long_reads_alignments, db_alignments):
     # fG = G.to_undirected()
     fG = G
     fG.name = 'friendships'
-
     # cov = nx.get_node_attributes(fG, 'cov')
-    reads_weights = get_friendships_from_spalignments(fG, spaligner_long_reads_tsv)
-    db_weights = get_friendships_from_spalignments(fG, spaligner_db_tsv, 10)
+    # reads_weights = get_friendships_from_spalignments(fG, spaligner_long_reads_tsv)
+    # db_weights = get_friendships_from_spalignments(fG, spaligner_db_tsv, 10)
+    reads_weights = get_friendships_from_spades_readable_fmt(long_reads_alignments, conj_dict)
+    db_weights = get_friendships_from_spades_readable_fmt(db_alignments, conj_dict, 10)
     weighted_edges = set(reads_weights.keys()).union(set(db_weights.keys()))
     weight_attr = {edge: {'reads_and_db': reads_weights[edge] + db_weights[edge]} for edge in weighted_edges}
     fG.add_edges_from((edge[0], edge[1], w_dict) for edge, w_dict in weight_attr.items())
-
     # write_G_statistics(fG)
-
     return fG
 
 def truncate_values(w_dict, keys):

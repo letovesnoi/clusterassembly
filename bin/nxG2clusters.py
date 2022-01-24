@@ -2,6 +2,7 @@
 
 import sys
 import os
+import subprocess
 
 import time
 
@@ -45,6 +46,7 @@ def parse_args():
                         help='Choose the weight for clustering',
                         choices=['cov_diff', 'reads_and_db', 'geometric_mean', 'harmonic_mean'])
     parser.add_argument('--gfa', '-g', required=True, help='Assembly graph')
+    parser.add_argument('--grseq', required=True, help='Helps preserve the conjugate names')
     parser.add_argument('--ground_truth', dest='spaligner_ground_truth_tsv', required=True,
                         help='It can be transcripts aligned to assembly graph using SPAligner [tsv]',)
     parser.add_argument('--friendships_reads', dest='spaligner_long_reads_tsv', required=False,
@@ -118,13 +120,17 @@ def main():
     if not os.path.exists(args.outdir):
         os.mkdir(args.outdir)
 
-    G = gfa_to_G(args.gfa, args.k)
+    command = 'python show_saves.py {} > {}'.format(args.grseq[:-3] + 'p', os.path.join(args.outdir, 'graph_pack.readable.grp'))
+    subprocess.run(command, shell=True)
+
+    conj_dict = graphs.get_conj_dict(os.path.join(args.outdir, 'graph_pack.readable.grp'))
+    G = gfa_to_G(args.gfa, conj_dict, args.k)
 
     # G = get_tst_G(G)
 
     # G = graphs.filter_G_by_degree(G)
 
-    fG = graphs.G_to_friendships_graph(G, args.spaligner_long_reads_tsv, args.spaligner_db_tsv)
+    fG = graphs.G_to_friendships_graph(G, conj_dict, args.spaligner_long_reads_tsv, args.spaligner_db_tsv)
     graphs.filter_G_by_weight(fG, args.w_name, args.filter)
 
     # Get feature matrix
@@ -184,11 +190,11 @@ def main():
                                               spaligner_ground_truth_tsv, p_clustering_tsv,
                                               gfa, fG, emb_outdir)'''
 
-    ground_truth_clustering_tsv = \
-        spaligner_parser.spaligner_to_clustering_tsv(args.spaligner_ground_truth_tsv,
-                                                     os.path.join(args.outdir, 'ground_truth_clustering.tsv'),
-                                                     fG)
-    evaluating_clustering.evaluate_clustering(clustering_tsv, ground_truth_clustering_tsv, args.outdir)
+    # ground_truth_clustering_tsv = \
+    #     spaligner_parser.spaligner_to_clustering_tsv(args.spaligner_ground_truth_tsv,
+    #                                                  os.path.join(args.outdir, 'ground_truth_clustering.tsv'),
+    #                                                  fG)
+    # evaluating_clustering.evaluate_clustering(clustering_tsv, ground_truth_clustering_tsv, args.outdir)
 
 
 def run_with_cProfile():
