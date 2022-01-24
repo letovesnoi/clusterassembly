@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # nxG2clusters.py assembly_graph_with_scaffolds.gfa outdir
 
 import sys
