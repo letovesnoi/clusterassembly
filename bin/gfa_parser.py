@@ -1,6 +1,6 @@
 # gfa_parser.py assembly_graph_with_scaffolds.gfa graph_pack.grseq outdir
 
-import sys, os
+import sys, os, subprocess
 
 import scipy as sp
 import pandas as pd
@@ -94,7 +94,12 @@ def main():
     outdir = sys.argv[4]
 
     # Get graph from gfa file
-    G = gfa_to_G(outdir, gfa, grseq, k)
+    command = 'python show_saves.py {} > {}'.format(grseq[:-3] + 'p',
+                                                    os.path.join(outdir, 'graph_pack.readable.grp'))
+    subprocess.run(command, shell=True)
+
+    conj_dict = graphs.get_conj_dict(os.path.join(outdir, 'graph_pack.readable.grp'))
+    G = gfa_to_G(gfa, conj_dict, k)
 
     # Get Adjacency matrix
     # A = graphs.get_A(G)
