@@ -27,6 +27,7 @@ process SPADES_SAVES {
     tuple val(sample), path('*.contigs.fa')           , optional:true, emit: contigs
     tuple val(sample), path('*.transcripts.fa')       , optional:true, emit: transcripts
     tuple val(sample), path('*.assembly.gfa')         , optional:true, emit: gfa
+    tuple val(sample), path('*.grseq')                , optional:true, emit: grseq
     tuple val(sample), path('*.spades.log')           , emit: log
     path  '*.version.txt'                             , emit: version
 
@@ -55,6 +56,12 @@ process SPADES_SAVES {
     fi
     if [ -f ${prefix}.spades_out/assembly_graph_with_scaffolds.gfa ]; then
         mv ${prefix}.spades_out/assembly_graph_with_scaffolds.gfa ${prefix}.assembly.gfa
+    fi
+
+    dirs=(\$(ls -d -r ${prefix}.spades_out/K*))
+    kDir=\$(basename \${dirs[0]})
+    if [ -f ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack.grseq ]; then
+        mv ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack.grseq ${prefix}.grseq
     fi
 
     echo \$(spades.py --version 2>&1) | sed 's/^.*SPAdes genome assembler v//; s/ .*\$//' > ${software}.version.txt
