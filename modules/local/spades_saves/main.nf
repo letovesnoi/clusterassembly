@@ -61,7 +61,7 @@ process SPADES_SAVES {
     dirs=(\$(ls -d -r ${prefix}.spades_out/K*))
     kDir=\$(basename \${dirs[0]})
     if [ -f ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack.grseq ]; then
-        mv ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack.grseq ${prefix}.grseq
+        cp ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack.grseq ${prefix}.grseq
     fi
 
     echo \$(spades.py --version 2>&1) | sed 's/^.*SPAdes genome assembler v//; s/ .*\$//' > ${software}.version.txt
