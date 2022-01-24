@@ -99,7 +99,7 @@ def get_friendships_from_spalignments(G, spaligner_tsv, friendship_rate=1):
         # print('Elapsed time on long reads graph construction: {}'.format((end - start) * 1.0 / 60 / 60))
     return friendships_dict
 
-def get_friendships_from_spades_readable_fmt(readable_fmt, conj_dict, friendship_rate=1):
+def get_friendships_from_spades_readable_fmt(readable_fmt, friendship_rate=1):
     friendships_dict = defaultdict(int)
     if readable_fmt:
         start = time.time()
@@ -113,10 +113,8 @@ def get_friendships_from_spades_readable_fmt(readable_fmt, conj_dict, friendship
                     weight = int(fields[1])
                     length = int(fields[3])
                     path = fields[4:]
-                    conj_path = [conj_dict[edge] for edge in reversed(path)]
-                    for p in [path, conj_path]:
-                        for u, v in itertools.combinations(p, 2):
-                            friendships_dict[(u, v)] += friendship_rate * weight
+                    for u, v in itertools.combinations(path, 2):
+                        friendships_dict[(u, v)] += friendship_rate * weight
                 else:
                     count = fin.readline().strip()
         end = time.time()
@@ -130,8 +128,8 @@ def G_to_friendships_graph(G, conj_dict, long_reads_alignments, db_alignments):
     # cov = nx.get_node_attributes(fG, 'cov')
     # reads_weights = get_friendships_from_spalignments(fG, spaligner_long_reads_tsv)
     # db_weights = get_friendships_from_spalignments(fG, spaligner_db_tsv, 10)
-    reads_weights = get_friendships_from_spades_readable_fmt(long_reads_alignments, conj_dict)
-    db_weights = get_friendships_from_spades_readable_fmt(db_alignments, conj_dict, 10)
+    reads_weights = get_friendships_from_spades_readable_fmt(long_reads_alignments)
+    db_weights = get_friendships_from_spades_readable_fmt(db_alignments, 10)
     weighted_edges = set(reads_weights.keys()).union(set(db_weights.keys()))
     weight_attr = {edge: {'reads_and_db': reads_weights[edge] + db_weights[edge]} for edge in weighted_edges}
     fG.add_edges_from((edge[0], edge[1], w_dict) for edge, w_dict in weight_attr.items())
