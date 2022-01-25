@@ -99,11 +99,11 @@ def get_friendships_from_spalignments(G, spaligner_tsv, friendship_rate=1):
         # print('Elapsed time on long reads graph construction: {}'.format((end - start) * 1.0 / 60 / 60))
     return friendships_dict
 
-def get_friendships_from_spades_readable_fmt(readable_fmt, friendship_rate=1):
+def get_friendships_from_spades_readable_mpr(readable_mpr, friendship_rate=1):
     friendships_dict = defaultdict(int)
-    if readable_fmt:
+    if readable_mpr:
         start = time.time()
-        with open(readable_fmt, 'r') as fin:
+        with open(readable_mpr, 'r') as fin:
             line = fin.readline()
             count = line.strip()
             while line:
@@ -121,15 +121,15 @@ def get_friendships_from_spades_readable_fmt(readable_fmt, friendship_rate=1):
         # print('Elapsed time on long reads graph construction: {}'.format((end - start) * 1.0 / 60 / 60))
         return friendships_dict
 
-def G_to_friendships_graph(G, conj_dict, long_reads_alignments, db_alignments):
+def G_to_friendships_graph(G, long_reads_alignments, db_alignments):
     # fG = G.to_undirected()
     fG = G
     fG.name = 'friendships'
     # cov = nx.get_node_attributes(fG, 'cov')
     # reads_weights = get_friendships_from_spalignments(fG, spaligner_long_reads_tsv)
     # db_weights = get_friendships_from_spalignments(fG, spaligner_db_tsv, 10)
-    reads_weights = get_friendships_from_spades_readable_fmt(long_reads_alignments)
-    db_weights = get_friendships_from_spades_readable_fmt(db_alignments, 10)
+    reads_weights = get_friendships_from_spades_readable_mpr(long_reads_alignments)
+    db_weights = get_friendships_from_spades_readable_mpr(db_alignments, 10)
     weighted_edges = set(reads_weights.keys()).union(set(db_weights.keys()))
     weight_attr = {edge: {'reads_and_db': reads_weights[edge] + db_weights[edge]} for edge in weighted_edges}
     fG.add_edges_from((edge[0], edge[1], w_dict) for edge, w_dict in weight_attr.items())

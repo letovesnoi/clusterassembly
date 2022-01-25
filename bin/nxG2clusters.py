@@ -49,12 +49,12 @@ def parse_args():
                         choices=['cov_diff', 'reads_and_db', 'geometric_mean', 'harmonic_mean'])
     parser.add_argument('--gfa', '-g', required=True, help='Assembly graph')
     parser.add_argument('--grp', required=True, help='Readable grseq format. For this use show_saves.py. Helps preserve conjugate names.')
-    parser.add_argument('--ground_truth', dest='spaligner_ground_truth_tsv', required=True,
+    parser.add_argument('--ground_truth', dest='ground_truth_readable_mpr', required=True,
                         help='It can be transcripts aligned to assembly graph using SPAligner [tsv]',)
-    parser.add_argument('--friendships_reads', dest='spaligner_long_reads_tsv', required=False,
+    parser.add_argument('--friendships_reads', dest='long_reads_readable_mpr', required=False,
                         help='Long reads aligned to assembly graph '
                              '(or any other confirmation of belonging to one transcript) [tsv]')
-    parser.add_argument('--friendships_db', dest='spaligner_db_tsv', required=False,
+    parser.add_argument('--friendships_db', dest='db_readable_mpr', required=False,
                         help='Reference transcripts aligned to assembly graph '
                              '(or any other confirmation of belonging to one transcript) [tsv]')
     parser.add_argument('-k', type=int, required=True,
@@ -129,7 +129,7 @@ def main():
 
     # G = graphs.filter_G_by_degree(G)
 
-    fG = graphs.G_to_friendships_graph(G, conj_dict, args.spaligner_long_reads_tsv, args.spaligner_db_tsv)
+    fG = graphs.G_to_friendships_graph(G, args.long_reads_readable_mpr, args.db_readable_mpr)
     graphs.filter_G_by_weight(fG, args.w_name, args.filter)
 
     # Get feature matrix
