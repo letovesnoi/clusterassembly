@@ -8,7 +8,7 @@ def modules = params.modules.clone()
 include { CONFIG_MODIFY } from '../../modules/local/spades_restart/config_modify' addParams ( options: modules['restart_short_reads'])
 include { MPR_NULLIFY } from '../../modules/local/spades_restart/mpr_nullify' addParams ( options: modules['restart_short_reads'])
 include{ COPY_DIR } from '../../modules/local/spades_restart/copy_dir' addParams ( options: modules['restart_short_reads'])
-include { SPADES_RESTART } from '../../modules/local/spades_restart/main' addParams( options: modules['restart_short_reads'] )
+include { SPADES_RESTART } from '../../modules/local/spades_restart/main' addParams( options: modules['restart_short_reads'], enable_conda: false )
 
 workflow PATHEXTEND_SHORT_READS {
     take:

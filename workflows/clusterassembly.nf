@@ -41,7 +41,7 @@ def modules = params.modules.clone()
 // MODULE: Local to the pipeline
 //
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
-include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'])
+include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'], enable_conda: false)
 include { MPR_TO_READABLE } from '../modules/local/mpr_to_readable' addParams ( options: [:] )
 include { CLUSTERING } from '../modules/local/clustering' addParams ( options: modules['clustering'] )
 

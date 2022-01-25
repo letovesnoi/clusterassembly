@@ -29,7 +29,7 @@ def line_to_node(line):
     name = fields[1]
     attr = {'seq': fields[2]}
     if 'KC:i:' in line:
-        kmer_count = int(fields[4][5:])
+        kmer_count = int(fields[3][5:])
         attr['KC'] = kmer_count
     return name, attr
 
