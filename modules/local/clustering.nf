@@ -44,11 +44,15 @@ process CLUSTERING {
     filename=\${basename%.*}
     show_saves.py \${filename}.grp > \${filename}.readable.grp
 
+    dirs=(\$(ls -d -r ${saves}/K*))
+    kDir=\$(basename \${dirs[0]})
+    k_size=\${kDir:1}
+
     nxG2clusters.py                                 \\
     --gfa ${gfa}                                    \\
     --grp \$(realpath \${filename}.readable.grp)    \\
     ${alignments}                                   \\
-    -k 49                                           \\
+    -k \${k_size}                                   \\
     -o ${prefix}.clustering_out
 
     if [ -f ${prefix}.clustering_out/clustering.tsv ]; then
