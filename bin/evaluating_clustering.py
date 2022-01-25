@@ -70,7 +70,7 @@ def F1_best_match(r_cluster, ground_truth_set, fout):
         if F1_best_match <= F1_curr:
             F1_best_match = F1_curr
             cluster_best_match = gt_cluster
-    if F1_best_match != 1:
+    if F1_best_match != 1 and r_cluster and cluster_best_match:
         fout.write(' '.join(sorted(r_cluster)) + '\n' + ' '.join(sorted(cluster_best_match)) + '\n\n')
     return F1_best_match
 
@@ -84,9 +84,12 @@ def F1_for_clustering(reconstructed_set, ground_truth_set, outdir):
     return F1
 
 def exact_recall(reconstructed_set, ground_truth_set):
+    exact_recall = 0
     up = len(reconstructed_set.intersection(ground_truth_set))
     down = len(ground_truth_set)
-    return up / down
+    if down != 0:
+        exact_recall = up / down
+    return exact_recall
 
 def evaluate_clustering(reconstructed_clustering_tsv, ground_truth_clustering_tsv, outdir):
     short_report_txt = os.path.join(outdir, 'short_report.txt')
