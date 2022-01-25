@@ -43,7 +43,7 @@ def modules = params.modules.clone()
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
 include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'])
 include { MPR_TO_READABLE } from '../modules/local/mpr_to_readable' addParams ( options: [:] )
-include { CLUSTERING } from '../modules/local/clustering' addParams ( options: [:] )
+include { CLUSTERING } from '../modules/local/clustering' addParams ( options: modules['clustering'] )
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules

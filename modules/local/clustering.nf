@@ -8,7 +8,7 @@ process CLUSTERING {
     tag "$sample"
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'pipeline_info', meta:[:], publish_by_meta:[]) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'clustering_out', meta:[:], publish_by_meta:[]) }
 
     conda (params.enable_conda ?
         "python=3.5.5 biopython==1.72 networkx==2.2 boltons==19.1.0 scipy==1.1 scikit-learn==0.20.0 python-louvain=0.13 umap-learn=0.3.2 seaborn"
