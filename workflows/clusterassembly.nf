@@ -43,6 +43,7 @@ def modules = params.modules.clone()
 include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
 include { SPADES_SAVES } from '../modules/local/spades_saves/main' addParams ( options: modules['spades_saves'])
 include { MPR_TO_READABLE } from '../modules/local/mpr_to_readable' addParams ( options: [:] )
+include { CLUSTERING } from '../modules/local/clustering' addParams ( options: [:] )
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -172,14 +173,18 @@ workflow CLUSTERASSEMBLY {
     )
 
     // TODO: Get clusters from assembly graph and readable alignment files
-
+    // TODO: use k size instead of saves directory
+    clustering_input_channel = SPADES_SAVES.out.saves.join(SPADES_SAVES.out.gfa).join(SPADES_SAVES.out.grseq).join(MPR_TO_READABLE.out.alignments)
+    CLUSTERING (
+        clustering_input_channel
+    )
 
     //
     // MODULE: Restart SPAdes using clusters from the last checkpoint using saves
     //
     PATHEXTEND_CLUSTERS (
         SPADES_SAVES.out.saves,
-        SPADES_SAVES.out.saves    // TODO: Replace by clusters
+        CLUSTERING.out.clustering
     )
 
     //
