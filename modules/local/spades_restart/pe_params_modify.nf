@@ -17,8 +17,7 @@ process PE_PARAMS_MODIFY {
     }
 
     input:
-    tuple val(sample), path(saves)
-    tuple val(sample), path(clusters)
+    tuple val(sample), path(saves), path(clusters)
 
     output:
     tuple val(sample), path(saves)

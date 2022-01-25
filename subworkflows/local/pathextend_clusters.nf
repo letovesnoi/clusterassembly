@@ -19,7 +19,7 @@ workflow PATHEXTEND_CLUSTERS {
     main:
         COPY_DIR ( saves )
         CONFIG_MODIFY ( COPY_DIR.out )
-        PE_PARAMS_MODIFY ( CONFIG_MODIFY.out, clusters )
+        PE_PARAMS_MODIFY ( CONFIG_MODIFY.out.join(clusters) )
         SPADES_RESTART ( PE_PARAMS_MODIFY.out )
 
     emit:
