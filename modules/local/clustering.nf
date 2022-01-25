@@ -23,7 +23,8 @@ process CLUSTERING {
     tuple val(sample), path(saves), path(gfa), path(grseq), path(readable_fmt)
 
     output:
-    tuple val(sample), path('*.clustering.tsv'),    emit: clustering
+    tuple val(sample), path('*.clustering.tsv'), emit: clustering
+    tuple val(sample), path('*.short_report.txt'), emit: short_report
 
     script: // This script is bundled with the pipeline, in nf-core/clusterassembly/bin/
     def prefix     = options.suffix ? "${sample}${options.suffix}" : "${sample}"
@@ -56,6 +57,10 @@ process CLUSTERING {
 
     if [ -f ${prefix}.clustering_out/clustering.tsv ]; then
         mv ${prefix}.clustering_out/clustering.tsv ${prefix}.clustering.tsv
+    fi
+
+    if [ -f ${prefix}.clustering_out/short_report.txt ]; then
+        mv ${prefix}.clustering_out/short_report.txt ${prefix}.short_report.txt
     fi
     """
 }

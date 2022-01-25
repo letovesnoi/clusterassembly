@@ -27,7 +27,7 @@ from persona.splitter import do_embedding
 
 from gfa_parser import gfa_to_G
 import graphs
-import spaligner_parser
+import  readable_mpr_parser
 import visualising_embedding
 import evaluating_clustering
 
@@ -189,11 +189,8 @@ def main():
                                               spaligner_ground_truth_tsv, p_clustering_tsv,
                                               gfa, fG, emb_outdir)'''
 
-    # ground_truth_clustering_tsv = \
-    #     spaligner_parser.spaligner_to_clustering_tsv(args.spaligner_ground_truth_tsv,
-    #                                                  os.path.join(args.outdir, 'ground_truth_clustering.tsv'),
-    #                                                  fG)
-    # evaluating_clustering.evaluate_clustering(clustering_tsv, ground_truth_clustering_tsv, args.outdir)
+    ground_truth_clustering_tsv = readable_mpr_parser.write_pathes_from_spades_readable_mpr(args.ground_truth_readable_mpr, args.outdir)
+    evaluating_clustering.evaluate_clustering(clustering_tsv, ground_truth_clustering_tsv, args.outdir)
 
 
 def run_with_cProfile():
