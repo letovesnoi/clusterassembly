@@ -35,6 +35,6 @@ process PE_PARAMS_MODIFY {
     filename=\${basename%.*}
     pe_params_old="${saves}/\${kDir}/configs/\${filename}.old.PE_PARAMS_MODIFY.\${ext}"
     cp \${pe_params} \${pe_params_old}
-    sed -i "s|rna_clusters.*|rna_clusters ${clusters}|" \$pe_params
+    sed -i "s|rna_clusters.*|rna_clusters \$(realpath ${clusters})|" \$pe_params
     """
 }
