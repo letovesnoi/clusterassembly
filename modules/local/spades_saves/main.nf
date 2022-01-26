@@ -25,9 +25,9 @@ process SPADES_SAVES {
     tuple val(sample), path('*.spades_out')           , emit: saves
     tuple val(sample), path('*.scaffolds.fa')         , optional:true, emit: scaffolds
     tuple val(sample), path('*.contigs.fa')           , optional:true, emit: contigs
-    tuple val(sample), path('*.transcripts.fa')       , optional:true, emit: transcripts
-    tuple val(sample), path('*.assembly.gfa')         , optional:true, emit: gfa
-    tuple val(sample), path('*.grseq')                , optional:true, emit: grseq
+    tuple val(sample), path('*.transcripts.fa')       , emit: transcripts
+    tuple val(sample), path('*.assembly.gfa')         , emit: gfa
+    tuple val(sample), path('*.grseq')                , emit: grseq
     tuple val(sample), path('*.mpr')                  , emit: mprs
     tuple val(sample), path('*.spades.log')           , emit: log
     path  '*.version.txt'                             , emit: version
