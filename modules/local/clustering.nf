@@ -20,7 +20,7 @@ process CLUSTERING {
     }
 
     input:
-    tuple val(sample), path(saves), path(gfa), path(grseq), path(readable_fmt)
+    tuple val(sample), path(saves), path(gfa), path(grseq), path(readable_mprs)
 
     output:
     tuple val(sample), path('*.clustering.tsv'), emit: clustering
@@ -28,7 +28,7 @@ process CLUSTERING {
 
     script: // This script is bundled with the pipeline, in nf-core/clusterassembly/bin/
     def prefix     = options.suffix ? "${sample}${options.suffix}" : "${sample}"
-    def alignments = ( readable_fmt.size() == 1 ) ? " --friendships_reads ${readable_fmt[0]}" : " --friendships_reads ${readable_fmt[0]} --friendships_db ${readable_fmt[1]} --ground_truth ${readable_fmt[1]}"
+    def alignments = ( readable_mprs.size() == 1 ) ? " --friendships_reads ${readable_mprs[0]}" : " --friendships_reads ${readable_mprs[0]} --friendships_db ${readable_mprs[1]}"
 
     """
     export PYTHONPATH=

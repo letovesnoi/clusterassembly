@@ -135,20 +135,21 @@ workflow CLUSTERASSEMBLY {
 
     //
     // SUBWORKFLOW: Join short reads, long reads and db sequences channels by sample id
-    // [ meta_id, [ fastq_1, fastq_2 ], fasta, fasta ]
+    //
+//     [ meta_id, [ fastq_1, fastq_2 ], fasta, fasta ]
     ch_short = BRANCH_SEQ.out.short_reads
     .map { meta, list ->
         sample = meta.id
         [sample, list] }
-    ch_long = BRANCH_SEQ.out.long_reads
-    .map { meta, list ->
+    ch_long_reads = BRANCH_SEQ.out.long_reads
+    .map { meta, long_reads ->
         sample = meta.id
-        [sample, list] }
-    ch_db = BRANCH_SEQ.out.db_seq
-    .map { meta, list ->
+        [sample, long_reads] }
+    ch_db_seq = BRANCH_SEQ.out.db_seq
+    .map { meta, db_seq ->
         sample = meta.id
-        [sample, list] }
-    all_by_sample = ch_short.join(ch_long).join(ch_db)
+        [sample, db_seq] }
+    all_by_sample = ch_short.join(ch_long_reads).join(ch_db_seq)
 
     //
     // MODULE: Run SPAdes with short reads and long sequences (long reads and database transcripts)
@@ -169,12 +170,12 @@ workflow CLUSTERASSEMBLY {
     // MODULE: Reformat SPAdes output alignment files from binary mpr to readable format
     //
     MPR_TO_READABLE (
-        SPADES_SAVES.out.saves
+        SPADES_SAVES.out.mprs
     )
 
-    // TODO: Get clusters from assembly graph and readable alignment files
+    // Get clusters from assembly graph and readable alignment files
     // TODO: use k size instead of saves directory
-    clustering_input_channel = SPADES_SAVES.out.saves.join(SPADES_SAVES.out.gfa).join(SPADES_SAVES.out.grseq).join(MPR_TO_READABLE.out.alignments)
+    clustering_input_channel = SPADES_SAVES.out.saves.join(SPADES_SAVES.out.gfa).join(SPADES_SAVES.out.grseq).join(MPR_TO_READABLE.out.readable_mprs)
     CLUSTERING (
         clustering_input_channel
     )
