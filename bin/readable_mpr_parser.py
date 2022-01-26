@@ -7,7 +7,7 @@ def write_pathes_from_spades_readable_mpr(readable_mpr, outdir, min_path_size=2)
     start = time.time()
     base = os.path.basename(readable_mpr)
     name = os.path.splitext(base)[0]
-    fpathes = os.path.join(outdir, name + '.pathes')
+    fpathes = os.path.join(outdir, name + '.tsv')
     fout = open(fpathes, 'w')
     with open(readable_mpr, 'r') as fin:
         line = fin.readline()

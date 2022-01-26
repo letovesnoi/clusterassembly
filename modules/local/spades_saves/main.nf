@@ -28,6 +28,7 @@ process SPADES_SAVES {
     tuple val(sample), path('*.transcripts.fa')       , optional:true, emit: transcripts
     tuple val(sample), path('*.assembly.gfa')         , optional:true, emit: gfa
     tuple val(sample), path('*.grseq')                , optional:true, emit: grseq
+    tuple val(sample), path('*.mpr')                  , emit: mprs
     tuple val(sample), path('*.spades.log')           , emit: log
     path  '*.version.txt'                             , emit: version
 
@@ -62,6 +63,12 @@ process SPADES_SAVES {
     kDir=\$(basename \${dirs[0]})
     if [ -f ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack.grseq ]; then
         cp ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack.grseq ${prefix}.grseq
+    fi
+    if [ -f  ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack_0.mpr ]; then
+        cp ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack_0.mpr graph_pack_0.mpr
+    fi
+    if [ -f  ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack_1.mpr ]; then
+        cp ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack_1.mpr graph_pack_1.mpr.mpr
     fi
 
     echo \$(spades.py --version 2>&1) | sed 's/^.*SPAdes genome assembler v//; s/ .*\$//' > ${software}.version.txt

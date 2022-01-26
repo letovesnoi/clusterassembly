@@ -1,5 +1,5 @@
 //
-// Replace *.mpr alignment files with blank to get only short reads assembly using spades restart
+// Get readable alignment file from spades binary mpr
 //
 
 // Import generic module functions
@@ -8,7 +8,7 @@ include { getSoftwareName } from './functions'
 params.options = [:]
 
 process MPR_TO_READABLE {
-    tag "${saves}"
+    tag "${sample}"
     conda (params.enable_conda ? "conda-forge::python=3.8.3 conda-forge::biopython" : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
         container "https://depot.galaxyproject.org/singularity/python:3.8.3"
@@ -17,23 +17,20 @@ process MPR_TO_READABLE {
     }
 
     input:
-    tuple val(sample), path(saves)
+    tuple val(sample), path(mprs)
 
     output:
-    tuple val(sample), path('*.readable_fmt'), emit: alignments
+    tuple val(sample), path('*.readable_mpr'), emit: readable_mprs
 
     script:
 
     """
-    dirs=(\$(ls -d -r ${saves}/K*))
-    kDir=\$(basename \${dirs[0]})
-
-    # Get readable alignment files from binary mpr
-    for path in \$(ls -d ${saves}/\${kDir}/saves/distance_estimation/graph_pack_*.mpr); do
+    # Get readable alignment files from binary mprs
+    for path in $mprs; do
         basename=\$(basename \${path})
         ext=\${basename##*.}
         filename=\${basename%.*}
-        readable_path="\${filename}.readable_fmt"
+        readable_path="\${filename}.readable_mpr"
         show_saves.py \${path} > \${readable_path}
     done
     """
