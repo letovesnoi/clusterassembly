@@ -13,7 +13,14 @@ import spaligner_parser
 from gfa_parser import gfa_to_G
 
 import graphs
-import clustering
+
+
+def clusters_list_to_dict(c_list):
+    c_dict = {}
+    for i, com in enumerate(c_list):
+        for node in com:
+            c_dict[node] = i
+    return c_dict
 
 
 def tsv_to_sets(tsv, min_component_size=3):
@@ -120,7 +127,7 @@ def get_node_colors(G, c_dict):
     return node_colors
 
 def plot_components_clusters(G, c_list, weight, outdir, n=4):
-    c_dict = clustering.clusters_list_to_dict(c_list)
+    c_dict = clusters_list_to_dict(c_list)
     pos = nx.spring_layout(G)
     largest_components = sorted(nx.connected_component_subgraphs(G), key=len, reverse=True)[:n]
     for i, component in enumerate(largest_components):

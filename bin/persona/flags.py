@@ -1,11 +1,25 @@
 from absl import flags
 
+import community
+
 import networkx.algorithms.community.label_propagation as label_prop
 import networkx.algorithms.community.modularity_max as modularity
 import networkx.algorithms.components.connected as components
 from networkx.algorithms.components import weakly_connected_components
 
-import clustering
+
+# from {0: 0, 1: 0, 2: 0, 3: 0, 4: 1, 5: 1, 6: 1 ... }
+# to [[0, 1, 2, 3], [4, 5, 6], ... ]
+def clusters_dict_to_list(c_dict):
+    c_list = []
+    for cluster in set(c_dict.values()):
+        c_list.append([nodes for nodes in c_dict.keys() if c_dict[nodes] == cluster])
+    return c_list
+
+def best_partition(G, weight='weight'):
+    c_dict = community.best_partition(G, weight=weight)
+    c_list = clusters_dict_to_list(c_dict)
+    return c_list
 
 
 _CLUSTERING_FN = {
@@ -13,7 +27,7 @@ _CLUSTERING_FN = {
     'modularity': modularity.greedy_modularity_communities,
     'connected_components': components.connected_components,
     'weakly_connected_components': weakly_connected_components,
-    'best_partition': clustering.best_partition,
+    'best_partition': best_partition,
 }
 
 flags.DEFINE_string(
