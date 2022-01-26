@@ -195,9 +195,9 @@ workflow CLUSTERASSEMBLY {
     QUALITY_ASSESSMENT (
         CLUSTERING.out.clustering,
         MPR_TO_READABLE.out.readable_mprs,
-//         PATHEXTEND_SHORT_READS.out.transcripts,
-//         SPADES_SAVES.out.transcripts,
-//         PATHEXTEND_CLUSTERS.out.transcripts,
+        PATHEXTEND_SHORT_READS.out.transcripts,
+        SPADES_SAVES.out.transcripts,
+        PATHEXTEND_CLUSTERS.out.transcripts
 //         ch_db_seq
     )
 
