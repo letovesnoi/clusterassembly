@@ -2,7 +2,6 @@
 
 import sys, os, subprocess
 
-import scipy as sp
 import pandas as pd
 
 import networkx as nx
