@@ -52,6 +52,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( opti
 include { BRANCH_SEQ } from '../subworkflows/local/branch_seq' addParams ( options: [:] )
 include { PATHEXTEND_SHORT_READS } from '../subworkflows/local/pathextend_short_reads' addParams( options: [:] )
 include { PATHEXTEND_CLUSTERS } from '../subworkflows/local/pathextend_clusters' addParams( options: [:] )
+include { QUALITY_ASSESSMENT } from '../subworkflows/local/quality_assessment' addParams ( options: [:] )
 
 /*
 ========================================================================================
@@ -186,6 +187,18 @@ workflow CLUSTERASSEMBLY {
     PATHEXTEND_CLUSTERS (
         SPADES_SAVES.out.saves,
         CLUSTERING.out.clustering
+    )
+
+    //
+    // MODULE: Quality evaluation and assessment of transcriptome assemblies
+    //
+    QUALITY_ASSESSMENT (
+        CLUSTERING.out.clustering,
+        MPR_TO_READABLE.out.readable_mprs,
+//         PATHEXTEND_SHORT_READS.out.transcripts,
+//         SPADES_SAVES.out.transcripts,
+//         PATHEXTEND_CLUSTERS.out.transcripts,
+//         ch_db_seq
     )
 
     //

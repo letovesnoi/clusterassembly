@@ -12,9 +12,6 @@ import argparse
 
 import networkx as nx
 
-import matplotlib.pyplot as plt
-plt.switch_backend('agg')
-
 import pandas as pd
 
 from sklearn.preprocessing import StandardScaler
@@ -27,15 +24,13 @@ from persona.splitter import do_embedding
 
 from gfa_parser import gfa_to_G
 import graphs
-import  readable_mpr_parser
 import visualising_embedding
-import evaluating_clustering
+import evaluate_clustering
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Clustering on graphs',
                                      usage='{} --gfa assembly_graph_with_scaffolds.gfa '
-                                           '--ground_truth transcripts_alignment.tsv '
                                            '--friendships_reads reads_alignment.tsv '
                                            '-k 49 --outdir clustering_out'.format(sys.argv[0]))
     parser.add_argument('--clustering', '-c', dest='c_name', default='best_partition',
@@ -49,8 +44,6 @@ def parse_args():
                         choices=['cov_diff', 'reads_and_db', 'geometric_mean', 'harmonic_mean'])
     parser.add_argument('--gfa', '-g', required=True, help='Assembly graph')
     parser.add_argument('--grp', required=True, help='Readable grseq format. For this use show_saves.py. Helps preserve conjugate names.')
-    parser.add_argument('--ground_truth', dest='ground_truth_readable_mpr', required=True,
-                        help='It can be transcripts aligned to assembly graph using SPAligner [tsv]',)
     parser.add_argument('--friendships_reads', dest='long_reads_readable_mpr', required=False,
                         help='Long reads aligned to assembly graph '
                              '(or any other confirmation of belonging to one transcript) [tsv]')
@@ -139,9 +132,9 @@ def main():
     persona_graph, persona_id_mapping = CreatePersonaGraph(fG, local_clustering_fn, args.w_name)
 
     # graphs drawing
-    graphs_outdir = os.path.join(args.outdir, 'graphs_out')
-    if not os.path.exists(graphs_outdir):
-        os.mkdir(graphs_outdir)
+    # graphs_outdir = os.path.join(args.outdir, 'graphs_out')
+    # if not os.path.exists(graphs_outdir):
+    #     os.mkdir(graphs_outdir)
     # graphs.plot_graph_components(G, args.w_name, graphs_outdir, n=4)
     # graphs.plot_graph_components(fG, args.w_name, graphs_outdir, n=4)
     # graphs.plot_graph_components(persona_graph, args.w_name, graphs_outdir, n=10)
@@ -153,10 +146,10 @@ def main():
     clustering = PersonaOverlappingClustering(non_overlapping_clustering, persona_id_mapping, 1)
 
     p_clustering_tsv = os.path.join(args.outdir, 'persona_clustering.tsv')
-    evaluating_clustering.write_clustering(non_overlapping_clustering, p_clustering_tsv)
+    evaluate_clustering.write_clustering(non_overlapping_clustering, p_clustering_tsv)
 
     clustering_tsv = os.path.join(args.outdir, 'clustering.tsv')
-    evaluating_clustering.write_clustering(clustering, clustering_tsv)
+    evaluate_clustering.write_clustering(clustering, clustering_tsv)
 
     nx.write_edgelist(persona_graph, os.path.join(args.outdir, 'persona_graph.tsv'))
 
@@ -188,9 +181,6 @@ def main():
     visualising_embedding.visualize_embedding(tot_emb_df, persona_to_node_tsv,
                                               spaligner_ground_truth_tsv, p_clustering_tsv,
                                               gfa, fG, emb_outdir)'''
-
-    ground_truth_clustering_tsv = readable_mpr_parser.write_pathes_from_spades_readable_mpr(args.ground_truth_readable_mpr, args.outdir)
-    evaluating_clustering.evaluate_clustering(clustering_tsv, ground_truth_clustering_tsv, args.outdir)
 
 
 def run_with_cProfile():

@@ -1,16 +1,14 @@
+#!/usr/bin/env python3
+
 import sys
 import os
-
-import pandas as pd
-import csv
 
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
 import networkx as nx
 
-import spaligner_parser
-from gfa_parser import gfa_to_G
+import readable_mpr_parser
 
 import graphs
 
@@ -152,16 +150,15 @@ def plot_graph_clusters(G, c_list, outdir):
 
 def main():
     clustering_tsv = sys.argv[1]
-    spaligner_tsv = sys.argv[2]
-    gfa = sys.argv[3]
-    k = int(sys.argv[4])
-    outdir = os.path.join(sys.argv[5])
+    ground_truth_readable_mpr = sys.argv[2]
+    outdir = sys.argv[3]
 
-    spaligner_clustering_tsv = \
-        spaligner_parser.spaligner_to_clustering_tsv(spaligner_tsv,
-                                                     os.path.join(outdir, 'spaligner_clustering.tsv'),
-                                                     gfa_to_G(gfa, k))
-    evaluate_clustering(clustering_tsv, spaligner_clustering_tsv, outdir)
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+
+    ground_truth_clustering_tsv = readable_mpr_parser.write_pathes_from_spades_readable_mpr(ground_truth_readable_mpr, outdir)
+
+    evaluate_clustering(clustering_tsv, ground_truth_clustering_tsv, outdir)
 
 
 if __name__ == '__main__':
