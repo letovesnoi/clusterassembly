@@ -23,5 +23,5 @@ workflow PATHEXTEND_CLUSTERS {
         SPADES_RESTART ( PE_PARAMS_MODIFY.out )
 
     emit:
-    SPADES_RESTART.out.transcripts // channel: [ path to transcripts ]
+    transcripts = SPADES_RESTART.out.transcripts // channel: [ path to transcripts ]
 }
