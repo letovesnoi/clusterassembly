@@ -14,7 +14,7 @@ process CLUSTERING_EVALUATION {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'metrics_out', meta:[:], publish_by_meta:[]) }
-    conda (params.enable_conda ? "conda-forge::python=3.5.5 conda-forge::biopython matplotlib networkx==2.2 scipy==1.1 pandas" : null)
+    conda (params.enable_conda ? "python biopython matplotlib networkx scipy pandas" : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
         container "https://depot.galaxyproject.org/singularity/python:3.8.3"
     } else {
