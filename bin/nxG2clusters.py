@@ -25,7 +25,6 @@ from persona.splitter import do_embedding
 from gfa_parser import gfa_to_G
 import graphs
 import visualising_embedding
-import evaluate_clustering
 
 
 def parse_args():
@@ -106,6 +105,14 @@ def get_total_emb(p_emb_tsv, features_tsv, persona_to_node_tsv):
     return tot_emb_df
 
 
+def write_clustering(clustering, tsv, min_clusters_size=2):
+    with open(tsv, 'w') as outfile:
+        for cluster in clustering:
+            if len(cluster) < min_clusters_size:
+                continue
+            outfile.write(','.join([str(x) for x in cluster]) + '\n')
+
+
 def main():
     args = parse_args()
 
@@ -146,10 +153,10 @@ def main():
     clustering = PersonaOverlappingClustering(non_overlapping_clustering, persona_id_mapping, 1)
 
     p_clustering_tsv = os.path.join(args.outdir, 'persona_clustering.tsv')
-    evaluate_clustering.write_clustering(non_overlapping_clustering, p_clustering_tsv)
+    write_clustering(non_overlapping_clustering, p_clustering_tsv)
 
     clustering_tsv = os.path.join(args.outdir, 'clustering.tsv')
-    evaluate_clustering.write_clustering(clustering, clustering_tsv)
+    write_clustering(clustering, clustering_tsv)
 
     nx.write_edgelist(persona_graph, os.path.join(args.outdir, 'persona_graph.tsv'))
 
