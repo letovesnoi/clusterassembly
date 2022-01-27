@@ -58,6 +58,17 @@ def run_mmseqs(proteins_path, outdir, min_seq_id=0.9):
     return rep_seq_path
 
 
+def get_pyfasta_suffix(num_files):
+    numbers_str = []
+    if num_files == 1:
+        numbers_str.append('split')
+    else:
+        num_signs = len(str(num_files)) - 1
+        for n in range(0, num_files):
+            numbers_str.append('0' * (num_signs - len(str(n))) + str(n))
+    return numbers_str
+
+
 def run_interproscan(rep_seq_path, outdir):
     global threads
 
@@ -74,14 +85,18 @@ def run_interproscan(rep_seq_path, outdir):
     subprocess.call(command, shell=True)
 
     # Split fasta into smaller chunks to speed up
-    command = 'pyfasta split -n 50 {}'.format(clear_rep_seq)
+    num_seq = int(subprocess.check_output('grep -c \'>\' {}'.format(clear_rep_seq), shell=True))
+    num_files = max(int(num_seq / 500), 1)
+    numbers_str = get_pyfasta_suffix(num_files)
+
+    command = 'pyfasta split -n {} {}'.format(num_files, clear_rep_seq)
     print(command)
     subprocess.call(command, shell=True)
 
     cat_cmd = 'cat'
-    for num in ['0' + str(n) for n in range(0, 10)] + list(range(10, 50)):
+    for suffix in numbers_str:
         # print(num)
-        filename = '{name}_rep_seq.clear.{num}'.format(name=name, num=num)
+        filename = '{name}_rep_seq.clear.{num}'.format(name=name, num=suffix)
         proteins_path = '{}.fasta'.format(filename)
         # Run IPR for each chunk separately
         command = 'interproscan.sh -i {proteins} -b {base} -cpu {threads} -dp -dra -appl Hamap,Pfam'\
