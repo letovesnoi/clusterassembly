@@ -17,7 +17,7 @@ def write_pathes_from_spades_readable_mpr(readable_mpr, outdir, min_path_size=2)
                 fields = line.strip().split()
                 path = fields[4:]
                 if len(path) >= min_path_size:
-                    fout.write(",".join(str(path)))
+                    fout.write(",".join(path) + '\n')
             else:
                 fin.readline().strip()
     fout.close()
