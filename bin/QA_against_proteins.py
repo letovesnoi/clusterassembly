@@ -128,7 +128,7 @@ def run_diamond(rep_seq_path, mgy_db, outdir):
 
 def get_counts(rep_seq_path, diamond_path, ipr_path, outdir):
     name = os.path.basename(rep_seq_path).split('.')[0]
-    results_path = os.path.join(outdir, '{}.results.txt'.format(name))
+    results_path = os.path.join(outdir, '{}.proteins_metrics.txt'.format(name))
     annotated_mgy = get_annotated_proteins(diamond_path)
     annotated_ipr = get_annotated_proteins(ipr_path)
     all_clusters = get_fasta_ids(rep_seq_path)
