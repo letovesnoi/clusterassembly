@@ -37,7 +37,7 @@ process SPADES_SAVES {
     def prefix      = options.suffix ? "${sample}${options.suffix}" : "${sample}"
     def input_reads = ( short_reads.size() == 1 ) ? "-s ${short_reads[0]}" : "-1 ${short_reads[0]} -2 ${short_reads[1]}"
     input_reads     += long_reads ? " --pacbio ${long_reads[0]}" : ""
-    input_reads     += db_seq ? " --pacbio ${db_seq[0]}" : ""
+    input_reads     += db_seq ? " --nanopore ${db_seq[0]}" : ""
 
     """
     spades.py \\
