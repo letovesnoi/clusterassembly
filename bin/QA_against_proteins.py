@@ -156,7 +156,8 @@ def main():
 
     proteins_path = run_prodigal(assembly_path, outdir)
 
-    rep_seq_path = run_mmseqs(proteins_path, outdir)
+    # rep_seq_path = run_mmseqs(proteins_path, outdir)
+    rep_seq_path = proteins_path
 
     ipr_path = run_interproscan(rep_seq_path, outdir)
 
