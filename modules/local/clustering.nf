@@ -27,7 +27,7 @@ process CLUSTERING {
 
     script: // This script is bundled with the pipeline, in nf-core/clusterassembly/bin/
     def prefix     = options.suffix ? "${sample}${options.suffix}" : "${sample}"
-    def alignments = ( readable_mprs.size() == 1 ) ? " --friendships_reads ${readable_mprs[0]}" : " --friendships_reads ${readable_mprs[0]} --friendships_db ${readable_mprs[1]}"
+    def alignments = ( readable_mprs.size() == 2 ) ? " --friendships_reads ${readable_mprs[1]}" : " --friendships_reads ${readable_mprs[1]} --friendships_db ${readable_mprs[2]}"
 
     """
     export PYTHONPATH=

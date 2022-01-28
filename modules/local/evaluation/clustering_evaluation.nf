@@ -28,7 +28,7 @@ process CLUSTERING_EVALUATION {
     tuple val(sample), path('*.clustering_metrics.txt'), emit: short_report
 
     when:
-    readable_mprs.size() > 1
+    readable_mprs.size() > 2
 
     script:
     def prefix      = options.suffix ? "${sample}${options.suffix}" : "${sample}"
@@ -36,7 +36,7 @@ process CLUSTERING_EVALUATION {
     """
     evaluate_clustering.py          \\
     ${reconstructed_clusters}       \\
-    ${readable_mprs[1]}             \\
+    ${readable_mprs[2]}             \\
     ${prefix}.clustering_metrics
 
     if [ -f ${prefix}.clustering_metrics/short_report.txt ]; then

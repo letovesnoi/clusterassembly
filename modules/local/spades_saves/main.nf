@@ -64,12 +64,8 @@ process SPADES_SAVES {
     if [ -f ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack.grseq ]; then
         cp ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack.grseq ${prefix}.grseq
     fi
-    if [ -f  ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack_0.mpr ]; then
-        cp ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack_0.mpr graph_pack_0.mpr
-    fi
-    if [ -f  ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack_1.mpr ]; then
-        cp ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack_1.mpr graph_pack_1.mpr
-    fi
+
+    cp ${prefix}.spades_out/\${kDir}/saves/distance_estimation/graph_pack_*.mpr .
 
     echo \$(spades.py --version 2>&1) | sed 's/^.*SPAdes genome assembler v//; s/ .*\$//' > ${software}.version.txt
     """
