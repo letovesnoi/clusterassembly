@@ -23,6 +23,7 @@ process AGAINST_PROTEINS_EVALUATION {
 
     input:
     tuple val(sample), path(short_reads_transcripts), path(all_transcripts), path(clusters_transcripts)
+    path(mgy)
 
     output:
     tuple val(sample), path('*.proteins_metrics.txt'), emit: short_report
@@ -31,9 +32,9 @@ process AGAINST_PROTEINS_EVALUATION {
     def prefix      = options.suffix ? "${sample}${options.suffix}" : "${sample}"
 
     """
-    QA_against_proteins.py ${short_reads_transcripts} ${prefix}.proteins_metrics
-    QA_against_proteins.py ${all_transcripts} ${prefix}.proteins_metrics
-    QA_against_proteins.py ${clusters_transcripts} ${prefix}.proteins_metrics
+    QA_against_proteins.py ${short_reads_transcripts} ${mgy} ${prefix}.proteins_metrics
+    QA_against_proteins.py ${all_transcripts} ${mgy} ${prefix}.proteins_metrics
+    QA_against_proteins.py ${clusters_transcripts} ${mgy} ${prefix}.proteins_metrics
 
     mv ${prefix}.proteins_metrics/*.proteins_metrics.txt .
     """

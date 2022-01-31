@@ -19,6 +19,11 @@ class WorkflowClusterassembly {
             log.error "No GTF annotation specified! The pipeline requires this file."
             System.exit(1)
         }
+
+        if (!params.mgy) {
+            log.error "Custer representatives database not specified with e.g. '--mgy MGY_DB' or via a detectable config file. Please see http://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/ and makedb"
+            System.exit(1)
+        }
     }
 
     //

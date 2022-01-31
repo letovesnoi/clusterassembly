@@ -12,7 +12,7 @@ from Bio import SeqIO
 
 threads = 16
 
-mgy_db = '/home/letovesnoi/work/data_mountpoint/mgy.dmnd'
+# mgy_db = '/home/letovesnoi/work/data_mountpoint/mgy.dmnd'
 
 
 def get_fasta_ids(fasta):
@@ -146,10 +146,11 @@ def get_counts(rep_seq_path, diamond_path, ipr_path, outdir):
 
 
 def main():
-    global mgy_db
+    # global mgy_db
 
     assembly_path = os.path.abspath(sys.argv[1])
-    outdir = sys.argv[2]
+    mgy_db = sys.argv[2]
+    outdir = sys.argv[3]
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)

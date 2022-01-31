@@ -13,12 +13,18 @@ WorkflowClusterassembly.initialise(params, log)
 // Check input path parameters to see if they exist
 def checkPathParamList = [
     params.input,
+    params.mgy,
     params.fasta, params.gtf
     ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+
+if (params.mgy) {
+    ch_mgy = file(params.mgy, checkIfExists: true)
+    if (ch_mgy.isEmpty()) {exit 1, "File provided with --mgy is empty: ${ch_mgy.getName()}!"}
+}
 
 /*
 ========================================================================================
@@ -198,7 +204,8 @@ workflow CLUSTERASSEMBLY {
         MPR_TO_READABLE.out.readable_mprs,
         PATHEXTEND_SHORT_READS.out.transcripts,
         SPADES_SAVES.out.transcripts,
-        PATHEXTEND_CLUSTERS.out.transcripts
+        PATHEXTEND_CLUSTERS.out.transcripts,
+        ch_mgy
     )
 
     //
