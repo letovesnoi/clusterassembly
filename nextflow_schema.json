@@ -24,6 +24,14 @@
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/clusterassembly/usage#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
                 },
+                "mgy": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "description": "Custer representatives database constructed using makedb. See http://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/.",
+                    "fa_icon": "fas fa-code-branch",
+                    "help_text": "This parameter is *mandatory* for transcript evaluation against proteins."
+                },
                 "outdir": {
                     "type": "string",
                     "description": "Path to the output directory where the results will be saved.",
@@ -41,6 +49,11 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                },
+                "save_merged_fastq": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-save",
+                    "description": "Save FastQ files after merging re-sequenced libraries in the results directory."
                 }
             }
         },
@@ -64,6 +77,15 @@
                     "description": "Path to FASTA genome file.",
                     "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
                     "fa_icon": "far fa-file-code"
+                },
+                "gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.gtf(\\.gz)?$",
+                    "description": "Path to GTF annotation file.",
+                    "fa_icon": "fas fa-code-branch",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified."
                 },
                 "igenomes_base": {
                     "type": "string",
