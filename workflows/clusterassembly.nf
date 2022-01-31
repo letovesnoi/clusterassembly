@@ -7,12 +7,13 @@
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Validate input parameters
-// WorkflowClusterassembly.initialise(params, log)
+WorkflowClusterassembly.initialise(params, log)
 
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
 def checkPathParamList = [
-    params.input
+    params.input,
+    params.fasta, params.gtf
     ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
@@ -198,7 +199,6 @@ workflow CLUSTERASSEMBLY {
         PATHEXTEND_SHORT_READS.out.transcripts,
         SPADES_SAVES.out.transcripts,
         PATHEXTEND_CLUSTERS.out.transcripts
-//         ch_db_seq
     )
 
     //
