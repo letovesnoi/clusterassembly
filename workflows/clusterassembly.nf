@@ -59,6 +59,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( opti
 include { BRANCH_SEQ } from '../subworkflows/local/branch_seq' addParams ( options: [:] )
 include { PATHEXTEND_SHORT_READS } from '../subworkflows/local/pathextend_short_reads' addParams( options: [:] )
 include { PATHEXTEND_CLUSTERS } from '../subworkflows/local/pathextend_clusters' addParams( options: [:] )
+include { PREPARE_GENOME } from '../subworkflows/local/prepare_genome' addParams( options: [:])
 include { QUALITY_ASSESSMENT } from '../subworkflows/local/quality_assessment' addParams ( options: [:] )
 
 /*
@@ -197,6 +198,11 @@ workflow CLUSTERASSEMBLY {
     )
 
     //
+    // SUBWORKFLOW: Uncompress and download reference genome files (fasta and gtf)
+    //
+    PREPARE_GENOME ()
+
+    //
     // MODULE: Quality evaluation and assessment of transcriptome assemblies
     //
     QUALITY_ASSESSMENT (
@@ -205,7 +211,8 @@ workflow CLUSTERASSEMBLY {
         PATHEXTEND_SHORT_READS.out.transcripts,
         SPADES_SAVES.out.transcripts,
         PATHEXTEND_CLUSTERS.out.transcripts,
-        ch_mgy
+        ch_mgy,
+        PREPARE_GENOME.out.fasta, PREPARE_GENOME.out.gtf
     )
 
     //

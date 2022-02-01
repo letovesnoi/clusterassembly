@@ -17,12 +17,15 @@ workflow QUALITY_ASSESSMENT {
     all_transcripts
     clusters_transcripts
     mgy
+    fasta
+    gtf
 
     main:
         CLUSTERING_EVALUATION ( clustering.join(readable_mprs) )
         AGAINST_PROTEINS_EVALUATION ( short_reads_transcripts.join(all_transcripts).join(clusters_transcripts), mgy )
         RNAQUAST_EVALUATION (
-            short_reads_transcripts.join(all_transcripts).join(clusters_transcripts)
+            short_reads_transcripts.join(all_transcripts).join(clusters_transcripts),
+            fasta, gtf
           )
 
     emit:
