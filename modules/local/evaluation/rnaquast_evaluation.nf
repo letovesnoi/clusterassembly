@@ -40,8 +40,6 @@ process RNAQUAST_EVALUATION {
     --reference ${fasta}               \\
     --gtf ${gtf}                       \\
     --output_dir ${prefix}.rnaquast_out   \\
-    --disable_infer_genes                 \\
-    --disable_infer_transcripts           \\
     --busco auto-lineage
 
     if [ -f ${prefix}.rnaquast_out/short_report.txt ]; then
