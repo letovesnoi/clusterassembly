@@ -28,7 +28,7 @@
                     "type": "string",
                     "format": "file-path",
                     "mimetype": "text/plain",
-                    "description": "Custer representatives database constructed using makedb. See http://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/.",
+                    "description": "Cluster representatives database constructed using makedb. See http://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/.",
                     "fa_icon": "fas fa-code-branch",
                     "help_text": "This parameter is *mandatory* for transcript evaluation against proteins."
                 },
