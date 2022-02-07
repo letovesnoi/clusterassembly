@@ -12,8 +12,32 @@
 
 * [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 
+
+* [rnaSPAdes](https://github.com/ablab/spades)
+    > Bushmanova, E., Antipov, D., Lapidus, A., & Prjibelski, A. D. rnaSPAdes: a de novo transcriptome assembler and its application to RNA-Seq data. GigaScience. 2019;8(9):giz100.
+
+* [rnaQUAST](https://github.com/ablab/rnaquast)
+    > Bushmanova, E., Antipov, D., Lapidus, A., Suvorov, V., & Prjibelski, A. D. rnaQUAST: a quality assessment tool for de novo transcriptome assemblies. Bioinformatics. 2016;32(14):2210-2212.
+
+* [Prodigal](https://github.com/hyattpd/Prodigal)
+    > Hyatt, D., Chen, G. L., LoCascio, P. F., Land, M. L., Larimer, F. W., & Hauser, L. J. Prodigal: prokaryotic gene recognition and translation initiation site identification. BMC bioinformatics. 2010;11(1):1-11.
+
+* [MMseqs](https://github.com/soedinglab/MMseqs2)
+    > Hauser, M., Steinegger, M., & Söding, J. MMseqs software suite for fast and deep clustering and searching of large protein sequence sets. Bioinformatics. 2016;32(9):1323-1330.
+
+* [Diamond](https://github.com/bbuchfink/diamond)
+    > Buchfink, B., Xie, C., & Huson, D. H. Fast and sensitive protein alignment using DIAMOND. Nature methods. 2015;12(1):59-60.
+
+* [InterProScan](https://www.ebi.ac.uk/interpro/search/sequence/)
+    > Quevillon, E., Silventoinen, V., Pillai, S., Harte, N., Mulder, N., Apweiler, R., & Lopez, R. InterProScan: protein domains identifier. Nucleic acids research. 2005;33(suppl_2):116-120.
+
 * [MultiQC](https://www.ncbi.nlm.nih.gov/pubmed/27312411/)
     > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
+
+## Algorithms
+
+* [Persona Embedding](https://github.com/google-research/google-research/tree/master/graph_embedding/persona)
+    > Epasto, A., Perozzi, B. Is a Single Embedding Enough? Learning Node Representations that Capture Multiple Social Contexts. In The Web Conference. 2019.
 
 ## Software packaging/containerisation tools
 
