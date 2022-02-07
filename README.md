@@ -28,8 +28,21 @@ On release, automated continuous integration tests run the pipeline on a full-si
 
 <!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
 
+0. Merge FastQ files ([`cat`](http://www.linfo.org/cat.html))
 1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+2. ASSEMBLY STEPS with [`rnaSPAdes`](https://github.com/ablab/spades)
+    1. Short reads assembly
+   2. Pathextend + Long-read paths
+   3. Overlapping clustering algorithm based on [`Epasto et. al, 2019`](https://github.com/google-research/google-research/tree/master/graph_embedding/persona)
+   4. Restart rnaSPAdes using pathextend utilizing clusters
+3. QUALITY ASSESSMENT
+    1. Clustering evaluation using isoform database: Jaccard similarity, recall and F1 score
+   2. Assemblies evaluation
+      1. rnaQUAST using reference genome and gene database ([`rnaQUAST`](https://github.com/ablab/rnaquast))
+      2. Transcripts against protein database ([`Prodigal`](https://github.com/hyattpd/Prodigal), [`Diamond`](https://github.com/bbuchfink/diamond) / [`InterProScan`](https://www.ebi.ac.uk/interpro/search/sequence/))
+4. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+
+# ![nf-core/clusterassembly](docs/images/clusterassembly_pipeline.png)
 
 ## Quick Start
 
