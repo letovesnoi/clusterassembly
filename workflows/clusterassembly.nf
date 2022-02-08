@@ -21,11 +21,6 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
-if (params.mgy) {
-    ch_mgy = file(params.mgy, checkIfExists: true)
-    if (ch_mgy.isEmpty()) {exit 1, "File provided with --mgy is empty: ${ch_mgy.getName()}!"}
-}
-
 /*
 ========================================================================================
     CONFIG FILES
@@ -211,7 +206,7 @@ workflow CLUSTERASSEMBLY {
         PATHEXTEND_SHORT_READS.out.transcripts,
         SPADES_SAVES.out.transcripts,
         PATHEXTEND_CLUSTERS.out.transcripts,
-        ch_mgy,
+        params.mgy,
         PREPARE_GENOME.out.fasta, PREPARE_GENOME.out.gtf
     )
 
