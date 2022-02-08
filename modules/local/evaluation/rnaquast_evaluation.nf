@@ -1,3 +1,7 @@
+//
+// Quality evaluation and assessment of transcriptome assemblies
+//
+
 // Import generic module functions
 include { initOptions; saveFiles; getSoftwareName } from './functions'
 
