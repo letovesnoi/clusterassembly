@@ -45,7 +45,7 @@ def check_file_ext(path, line, extensions):
             print_error("Path contains spaces!", "Line", line)
         err_ext = True
         for ext in extensions:
-            if path.endswith(".{}.gz".format(ext)):
+            if path.endswith(".{}.gz".format(ext)) or path.endswith(".{}".format(ext)):
                 err_ext = False
                 break
         if err_ext:
