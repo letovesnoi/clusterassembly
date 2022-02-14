@@ -65,6 +65,10 @@ It is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](h
     ```console
     nextflow run nf-core/clusterassembly -profile conda --input samplesheet.csv --genome GRCh37 --mgy peptide_database
     ```
+   or
+   ```console
+    nextflow run nf-core/clusterassembly -profile conda --input samplesheet.csv --fasta GRCh37.fasta --gtf GRCh37.gtf --mgy peptide_database
+    ```
 
 ## Documentation
 
