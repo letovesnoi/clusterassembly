@@ -50,7 +50,7 @@ def check_file_ext(path, line, extensions):
                 break
         if err_ext:
             print_error(
-                "File does not have extension '." + ".gz' or '.".join(extensions) + ".gz'!",
+                "File does not have extension '." + ".gz' or '.".join(extensions) + ".gz' or '." + "' or '.".join(extensions) + "'",
                 "Line",
                 line,
             )
