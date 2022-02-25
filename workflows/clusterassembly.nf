@@ -56,16 +56,17 @@ include { PATHEXTEND_SHORT_READS } from '../subworkflows/local/pathextend_short_
 include { PATHEXTEND_CLUSTERS } from '../subworkflows/local/pathextend_clusters' addParams( options: [:] )
 include { PREPARE_GENOME } from '../subworkflows/local/prepare_genome' addParams( options: [:])
 include { QUALITY_ASSESSMENT } from '../subworkflows/local/quality_assessment' addParams ( options: [:] )
+include { COMPRESS as COMPRESS_SHORT_READS } from '../subworkflows/local/compress' addParams ( options: [:] )
+include { COMPRESS as COMPRESS_LONG_READS } from '../subworkflows/local/compress' addParams ( options: [:] )
+include { GET_FASTA } from '../subworkflows/local/get_fasta' addParams ( options: [:] )
+include { CONCATENATE as CONCATENATE_SHORT_READS } from '../subworkflows/local/concatenate' addParams( options: [:] )
+include { CONCATENATE as CONCATENATE_LONG_READS } from '../subworkflows/local/concatenate' addParams( options: [:] )
 
 /*
 ========================================================================================
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
 ========================================================================================
 */
-
-def cat_fastq_options = modules['cat_fastq']
-if ( !params.save_merged_fastq ) { cat_fastq_options['publish_files'] = false }
-
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
 
@@ -74,7 +75,6 @@ multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"
 //
 include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
 include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options )
-include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options )
 
 /*
 ========================================================================================
@@ -94,40 +94,44 @@ workflow CLUSTERASSEMBLY {
     //
     INPUT_CHECK (
         ch_input
-    )
-
-    //
-    // SUBWORKFLOW: Concatenate sequence files from the same sample if required (separately for each type of data)
-    //
-    INPUT_CHECK.out
-    .map {
+    ).map {
         meta, list ->
             meta.id = meta.id.split('_')[0..-2].join('_')
             [ meta, list ] }
-    .groupTuple(by: [0])
-    .branch {
-        meta, list ->
-            single : list.size() == 1
-                return [ meta, list.flatten() ]
-            multiple: list.size() > 1
-                return [ meta, list.flatten() ]
-    }
     .set { ch_seq }
-
-    CAT_FASTQ (
-        ch_seq.multiple
-    )
-    .reads
-    .mix(ch_seq.single)
-    .set { ch_cat_seq }
-    ch_software_versions = ch_software_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     //
     // SUBWORKFLOW: Split input sequences into short reads, long reads and database sequences
     //
     BRANCH_SEQ (
-        ch_cat_seq
+        ch_seq
     )
+
+    //SHORT READS
+    // Compress uncompressed reads files
+    COMPRESS_SHORT_READS(
+        BRANCH_SEQ.out.short_reads
+    )
+    // Concatenate short reads files from the same sample if required
+    CONCATENATE_SHORT_READS(
+        COMPRESS_SHORT_READS.out.reads
+    )
+    ch_software_versions = ch_software_versions.mix(CONCATENATE_SHORT_READS.out.versions.first().ifEmpty(null))
+
+    // LONG READS
+    // Convert long reads to fasta format
+    GET_FASTA(
+        BRANCH_SEQ.out.long_reads
+    )
+    // Compress uncompressed reads files
+    COMPRESS_LONG_READS(
+        GET_FASTA.out.reads
+    )
+    // Concatenate long reads files from the same sample if required
+    CONCATENATE_LONG_READS(
+        COMPRESS_LONG_READS.out.reads
+    )
+    ch_software_versions = ch_software_versions.mix(CONCATENATE_LONG_READS.out.versions.ifEmpty(null))
 
     //
     // MODULE: Run FastQC
@@ -141,11 +145,11 @@ workflow CLUSTERASSEMBLY {
     // SUBWORKFLOW: Join short reads, long reads and db sequences channels by sample id
     //
 //     [ meta_id, [ fastq_1, fastq_2 ], fasta, fasta ]
-    ch_short = BRANCH_SEQ.out.short_reads
+    ch_short_reads = CONCATENATE_SHORT_READS.out.reads
     .map { meta, list ->
         sample = meta.id
         [sample, list] }
-    ch_long_reads = BRANCH_SEQ.out.long_reads
+    ch_long_reads = CONCATENATE_LONG_READS.out.reads
     .map { meta, long_reads ->
         sample = meta.id
         [sample, long_reads] }
@@ -153,7 +157,7 @@ workflow CLUSTERASSEMBLY {
     .map { meta, db_seq ->
         sample = meta.id
         [sample, db_seq] }
-    all_by_sample = ch_short.join(ch_long_reads).join(ch_db_seq)
+    all_by_sample = ch_short_reads.join(ch_long_reads).join(ch_db_seq)
 
     //
     // MODULE: Run SPAdes with short reads and long sequences (long reads and database transcripts)
