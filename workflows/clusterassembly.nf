@@ -137,7 +137,7 @@ workflow CLUSTERASSEMBLY {
     // MODULE: Run FastQC
     //
     FASTQC (
-        BRANCH_SEQ.out.short_reads
+        COMPRESS_SHORT_READS.out.reads
     )
     ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
 
