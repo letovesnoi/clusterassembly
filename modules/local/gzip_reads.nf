@@ -29,17 +29,19 @@ process GZIP_READS {
     if (meta.single_end) {
         """
         gzip -f ${reads}
+        cat <<-END_VERSIONS > versions.yml
+        "${task.process}":
+            gzip: \$(echo \$(gzip --version 2>&1 | sed '2,\$d' | sed 's/gzip //'))
+        END_VERSIONS
         """
     } else {
         """
         gzip -f ${reads[0]}
         gzip -f ${reads[1]}
+        cat <<-END_VERSIONS > versions.yml
+        "${task.process}":
+            gzip: \$(echo \$(gzip --version 2>&1 | sed '2,\$d' | sed 's/gzip //'))
+        END_VERSIONS
         """
     }
-    """
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        gzip: \$(echo \$(gzip --version 2>&1) | sed 's/^.*(gzip) //; s/ Copyright.*\$//')
-    END_VERSIONS
-    """
 }
