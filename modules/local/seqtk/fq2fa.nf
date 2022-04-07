@@ -23,7 +23,7 @@ process FQ2FA {
     tuple val(sample), path('*.fasta'), emit: reads_in_fasta
 
     when:
-    reads.endsWith('.fastq') or reads.endsWith('.fq') or reads.endsWith('.fastq.gz') or reads.endsWith('.fq.gz')
+    reads.toString().endsWith('.fastq') or reads.toString().endsWith('.fq') or reads.toString().endsWith('.fastq.gz') or reads.toString().endsWith('.fq.gz')
 
     script:
     """
