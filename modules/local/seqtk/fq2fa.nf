@@ -28,8 +28,8 @@ process FQ2FA {
     script:
     """
     basename=\$(basename ${reads})
-    ext=\${basename##*.}
-    filename=\${basename%.*}
+    ext=\${basename#*.}
+    filename=\${basename%%.*}
     seqtk seq -a ${reads} > \${filename}.fasta
     """
 }
