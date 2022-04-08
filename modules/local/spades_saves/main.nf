@@ -36,8 +36,8 @@ process SPADES_SAVES {
     def software    = getSoftwareName(task.process)
     def prefix      = options.suffix ? "${sample}${options.suffix}" : "${sample}"
     def input_reads = ( short_reads.size() == 1 ) ? "-s ${short_reads[0]}" : "-1 ${short_reads[0]} -2 ${short_reads[1]}"
-    input_reads     += long_reads ? " --pacbio ${long_reads[0]}" : ""
-    input_reads     += db_seq ? " --nanopore ${db_seq[0]}" : ""
+    input_reads     += long_reads.isFile() ? " --pacbio ${long_reads}" : ""
+    input_reads     += db_seq.isFile() ? " --nanopore ${db_seq}" : ""
 
     """
     spades.py \\

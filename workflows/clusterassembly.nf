@@ -157,7 +157,11 @@ workflow CLUSTERASSEMBLY {
     .map { meta, db_seq ->
         sample = meta.id
         [sample, db_seq] }
-    all_by_sample = ch_short_reads.join(ch_long_reads).join(ch_db_seq)
+    all_by_sample = ch_short_reads.join(ch_long_reads, remainder: true).join(ch_db_seq, remainder: true)
+    .map { sample, short_reads, long_reads, db_seq ->
+        long_reads = Objects.isNull(long_reads) ? ['/'] : long_reads
+        db_seq     = Objects.isNull(db_seq) ? ['/'] : db_seq
+        [sample, short_reads, long_reads, db_seq] }
 
     //
     // MODULE: Run SPAdes with short reads and long sequences (long reads and database transcripts)

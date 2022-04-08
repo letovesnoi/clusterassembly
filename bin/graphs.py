@@ -119,7 +119,7 @@ def get_friendships_from_spades_readable_mpr(readable_mpr, friendship_rate=1):
                     count = fin.readline().strip()
         end = time.time()
         # print('Elapsed time on long reads graph construction: {}'.format((end - start) * 1.0 / 60 / 60))
-        return friendships_dict
+    return friendships_dict
 
 def G_to_friendships_graph(G, long_reads_alignments, db_alignments):
     # fG = G.to_undirected()
